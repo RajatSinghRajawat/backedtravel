@@ -6,8 +6,10 @@ const transporter = nodemailer.createTransport({
     secure: true,
     port: 465,
     auth: {
-        user: 'santoshkumarsharmabagda@gmail.com',  // Your email
-        pass: 'ihqt onaj jspt ahgq',      // Your app password (not your email password)
+        // user: 'santoshkumarsharmabagda@gmail.com',  // Your email
+        // pass: 'ihqt onaj jspt ahgq',      // Your app password (not your email password)
+          user: 'rajatsinghrajawatrajawat@gmail.com',
+        pass: 'qbys vodx ezrt pzmd'
     },
 });
 
@@ -15,7 +17,7 @@ const transporter = nodemailer.createTransport({
 const sendEmail = async (to, subject, text, html = null) => {
     try {
         const mailOptions = {
-            from: 'santoshkumarsharmabagda@gmail.com',
+            from: 'rajatsinghrajawatrajawat@gmail.com',
             to: to,                     // List of recipients
             subject: subject,           // Subject line
             text: text,                 // Plain text body

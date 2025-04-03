@@ -19,6 +19,56 @@ exports.ChekEmail = async (req, res) => {
     }
 };
 
+// exports.sendEmail = async (req, res) => {
+//     try {
+//         const { email, password } = req.body;
+//         const otp = Math.floor(100000 + Math.random() * 900000);
+
+//         const subject = 'Your Solo Trip OTP Verification Code';
+//         const text = `Your OTP for Solo Trip account verification is: ${otp}`;
+//         const html = `
+//             <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px;">
+//                 <h2 style="color: #3498db;">Welcome to Solo Trip! 🏞️</h2>
+//                 <p style="font-size: 18px;">Your One-Time Password (OTP) for account verification is:</p>
+//                 <h1 style="color: #e74c3c;">${otp}</h1>
+//                 <p style="font-size: 16px;">Please enter this code to complete your verification. The OTP is valid for 10 minutes.</p>
+//                 <hr style="margin: 20px 0;">
+//                 <p style="font-size: 14px; color: #7f8c8d;">If you did not request this, please ignore this email.</p>
+//                 <p style="font-size: 14px; color: #7f8c8d;">Happy Travels! 🌍<br>— The Solo Trip Team</p>
+//             </div>
+//         `;
+//         sendEmail(
+//             email,
+//             subject,
+//             text,
+//             html
+//         ).catch(console.error);
+
+//         let hashedPassword = null;
+//         if (password) {
+//             hashedPassword = await bcrypt.hash(password, 10);
+//         }
+//         const user = await User.findOne({ email });
+//         if (!user) {
+//             await User.create({
+//                 email,
+//                 Otp: otp,
+//                 password: hashedPassword
+//             });
+//         } else {
+//             const updateData = { Otp: otp };
+//             if (password) {
+//                 updateData.password = hashedPassword;
+//             }
+//             await User.updateOne({ email }, { $set: updateData });
+//         }
+//         res.status(200).json({ message: "Email sent successfully" });
+//     } catch (error) {
+//         console.error("Error =>", error);
+//         res.status(500).json({ message: "Error logging in", error: error.message });
+//     }
+// };
+
 exports.sendEmail = async (req, res) => {
     try {
         const { email } = req.body;
@@ -43,30 +93,21 @@ exports.sendEmail = async (req, res) => {
             text,
             html
         ).catch(console.error);
-
-        let hashedPassword = null;
-        if (password) {
-            hashedPassword = await bcrypt.hash(password, 10);
-        }
         const user = await User.findOne({ email });
-        if (!user) {
-            await User.create({
-                email,
+        if(!user){
+            await User.insertOne({
                 Otp: otp,
-                password: hashedPassword
-            });
-        } else {
-            const updateData = { Otp: otp };
-            if (password) {
-                updateData.password = hashedPassword;
-            }
-            await User.updateOne({ email }, { $set: updateData });
+                email
+            })
+        }else{
+            await User.updateOne({ email }, { Otp: otp });
         }
         res.status(200).json({ message: "Email sent successfully" });
     } catch (error) {
         res.status(500).json({ message: "Error logging in", error });
     }
 };
+
 
 exports.verifyOtp = async (req, res) => {
     try {
@@ -112,6 +153,8 @@ exports.login = async (req, res) => {
         if (!user) return res.status(404).json({ message: "User not found" });
 
         const isMatch = await bcrypt.compare(password, user.password);
+        console.log(isMatch,"dfddf");
+        
         if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
