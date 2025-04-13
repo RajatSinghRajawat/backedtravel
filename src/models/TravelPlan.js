@@ -1,31 +1,41 @@
 const mongoose = require("mongoose");
 
 const TravelPlanSchema = new mongoose.Schema({
-  destination: { type: String, required: true },
- 
+  destination: { type: String },
+
   startDate: { type: Date, required: true },
   endDate: { type: Date, required: true },
   transport: {
     type: String,
     required: true,
-    enum: ["Car", "Bus", "Train", "Flight", "Bike", "Boat"] 
+    enum: ["Car", "Bus", "Train", "Flight", "Bike", "Boat"]
   },
-  interests: { 
-    type: [String], 
-    required: true, 
-    enum: ["Mountains", "Trekking", "Beaches", "Wildlife", "City Tour", "Adventure Sports", "Cultural"] 
+  interests: {
+    type: [String],
+    required: true,
+    enum: ["Mountains", "Trekking", "Beaches", "Wildlife", "City Tour", "Adventure Sports", "Cultural"]
   },
   budget: { type: Number, required: true },
   travelBuddyGender: {
     type: String,
     required: true,
-    enum: ["Male", "Female", "Other"], 
+    enum: ["Male", "Female", "Other"],
     trim: true,
   },
   travelBuddyAge: {
-    type: Number,
+    type: String,
     required: true
   },
+  travelAuthor: {
+    type: String,
+    required: true
+  },
+  travelDescription: {
+    type: String,
+    required: true
+  },
+  States: { type: String, required: true },
+  City: { type: String, required: true },
 
   img: { type: [], required: true }
 });

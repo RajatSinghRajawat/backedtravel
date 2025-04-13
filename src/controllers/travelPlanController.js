@@ -3,7 +3,7 @@ const TravelPlan = require("../models/TravelPlan");
 // Create a new travel plan
 exports.createTravelPlan = async (req, res) => {
   try {
-    const { destination, travelBuddyGender, startDate, endDate, transport, budget, travelBuddyAge } = req.body;
+    const { destination, travelBuddyGender, startDate, endDate, transport, budget, travelBuddyAge, travelAuthor, travelDescription, States, City } = req.body;
     console.log(req.body);
 
     // If multiple images are uploaded, store their filenames in an array
@@ -19,6 +19,10 @@ exports.createTravelPlan = async (req, res) => {
       budget,
       travelBuddyGender,
       travelBuddyAge,
+      travelDescription,
+      travelAuthor,
+      States,
+      City,
       img: imgs // Store array of images
     });
 
@@ -33,7 +37,7 @@ exports.createTravelPlan = async (req, res) => {
 
 exports.getAllTravelPlans = async (req, res) => {
   try {
-    let { page, limit } = req.query;
+    let { page, limit, States, City } = req.query;
 
     // Convert query parameters to numbers and set defaults
     page = parseInt(page) || 1;
@@ -41,14 +45,20 @@ exports.getAllTravelPlans = async (req, res) => {
 
     const skip = (page - 1) * limit;
 
-    // Get total count for pagination metadata
-    const total = await TravelPlan.countDocuments();
+    // Create filter object based on state and city
+    let filter = {};
+    if (States) filter.States = States;
+    if (City) filter.City = City;
 
-    const travel = await TravelPlan.find().skip(skip).limit(limit);
+    // Get total count for pagination metadata
+    const total = await TravelPlan.countDocuments(filter);
+
+    // Fetch filtered travel plans with pagination
+    const travel = await TravelPlan.find(filter).skip(skip).limit(limit);
 
     res.status(200).json({
       message: "Get all Events",
-      travel: travel,
+      travel,
       pagination: {
         total,
         page,
@@ -60,3 +70,4 @@ exports.getAllTravelPlans = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
