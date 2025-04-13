@@ -72,16 +72,17 @@ exports.getAllBlogs = async (req, res) => {
     limit = parseInt(limit);
 
     const query = {};
-if (req.query.States) {
-  query.States = { $regex: new RegExp(req.query.States, "i") };
-}
-if (req.query.City) {
-  query.City = { $regex: new RegExp(req.query.City, "i") };
-}
+    if (req.query.States) {
+      query.States = { $regex: new RegExp(req.query.States, "i") };
+    }
+    if (req.query.City) {
+      query.City = { $regex: new RegExp(req.query.City, "i") };
+    }
 
     console.log("Generated Query:", query); // Debugging
 
     const blogs = await Blog.find(query)
+      .sort({ createdAt: -1 }) // ✅ Sort by latest created blog first
       .skip((page - 1) * limit)
       .limit(limit);
 
@@ -97,9 +98,11 @@ if (req.query.City) {
       totalBlogs,
     });
   } catch (error) {
+    console.error("Error in getAllBlogs:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
 
 
 
