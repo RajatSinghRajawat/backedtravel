@@ -1,5 +1,5 @@
 const express = require('express');
-const { register, login, updateUser, getUser, sendEmail, ChekEmail, verifyOtp, logout } = require('../controllers/authController');
+const { register, login, updateUser, getUser, sendEmail, ChekEmail, verifyOtp, logout, forgotPassword } = require('../controllers/authController');
 const upload = require('../../multer');
 const { createBlog, getAllBlogs, getBlogById, deleteBlog, updateBlog } = require('../controllers/blogController');
 const { createTravelPlan, getAllTravelPlans, getTravelPlanById, updateTravelPlan, deleteTravelPlan } = require('../controllers/travelPlanController');
@@ -14,7 +14,7 @@ router.post('/sendemail',sendEmail)
 router.post('/checkemail',ChekEmail)
 router.post("/verifyotp", verifyOtp);
 router.post("/logout", logout);
-
+router.post("/forgotpassword", forgotPassword)
 
 
 router.post("/addblogs", upload.array("img"), createBlog);
@@ -30,6 +30,7 @@ router.get("/getEvents", getAllTravelPlans);
 // router.get("/:id", getTravelPlanById);
 // router.put("/:id", updateTravelPlan);
 // router.delete("/:id", deleteTravelPlan);
+
 
 
 module.exports = router;
