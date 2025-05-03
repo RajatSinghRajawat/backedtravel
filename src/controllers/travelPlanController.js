@@ -3,7 +3,7 @@ const TravelPlan = require("../models/TravelPlan");
 // Create a new travel plan
 exports.createTravelPlan = async (req, res) => {
   try {
-    const { destination, travelBuddyGender, startDate, endDate, transport, budget, travelBuddyAge, travelAuthor, travelDescription, States, City } = req.body;
+    const { destination, travelBuddyGender, startDate, endDate, transport, budget, travelBuddyAge, travelAuthor, travelDescription, States, City ,creator } = req.body;
     console.log(req.body);
 
     // If multiple images are uploaded, store their filenames in an array
@@ -23,6 +23,7 @@ exports.createTravelPlan = async (req, res) => {
       travelAuthor,
       States,
       City,
+      creator,
       img: imgs // Store array of images
     });
 

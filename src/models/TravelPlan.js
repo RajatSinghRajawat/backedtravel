@@ -37,7 +37,13 @@ const TravelPlanSchema = new mongoose.Schema({
   States: { type: String, required: true },
   City: { type: String, required: true },
 
-  img: { type: [], required: true }
+  img: { type: [], required: true },
+  creator: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    // required: true
+  }
+
 });
 
 const TravelPlan = mongoose.model("TravelPlan", TravelPlanSchema);

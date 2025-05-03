@@ -1,5 +1,5 @@
 const express = require('express');
-const { register, login, updateUser, getUser, sendEmail, ChekEmail, verifyOtp, logout, forgotPassword } = require('../controllers/authController');
+const { register, login, updateUser, getUser, sendEmail, ChekEmail, verifyOtp, logout, forgotPassword, sendUserDetailsToEventCreator, adminregister, getAdmin } = require('../controllers/authController');
 const upload = require('../../multer');
 const { createBlog, getAllBlogs, getBlogById, deleteBlog, updateBlog } = require('../controllers/blogController');
 const { createTravelPlan, getAllTravelPlans, getTravelPlanById, updateTravelPlan, deleteTravelPlan } = require('../controllers/travelPlanController');
@@ -27,10 +27,13 @@ router.put("/updateblog/:id", upload.array("img"), updateBlog);
 
 router.post("/addEvents",upload.array("img") ,  createTravelPlan);
 router.get("/getEvents", getAllTravelPlans);
+router.post("/sendUserDetailsToEventCreator", sendUserDetailsToEventCreator);
+
 // router.get("/:id", getTravelPlanById);
 // router.put("/:id", updateTravelPlan);
 // router.delete("/:id", deleteTravelPlan);
 
-
+router.post("/adminadd" , adminregister)
+router.post("/adminget" , getAdmin)
 
 module.exports = router;
