@@ -3,18 +3,18 @@ const Blog = require("../models/blogModel");
 // Upload a new blog
 exports.createBlog = async (req, res) => {
   try {
-    const { title, shortdescription, fulldescription, facebook, threads, States, City } = req.body;
+    const { title, shortdescription, fulldescription, facebook, States, City } = req.body;
     console.log(req.body);
 
     const imgs = req.files ? req.files.map(file => file.filename) : [];
 
     console.log(imgs);
 
-    if (!title || !shortdescription || !fulldescription || !imgs || !facebook || !threads || !States || !City) {
+    if (!title || !shortdescription || !fulldescription || !imgs || !facebook || !States || !City) {
       return res.status(400).json({ error: "All fields are required" });
     }
 
-    const newBlog = await Blog.create({ title, shortdescription, img: imgs, fulldescription, facebook, threads, States, City });
+    const newBlog = await Blog.create({ title, shortdescription, img: imgs, fulldescription, facebook, States, City });
 
     res.status(201).json({ message: "Blog uploaded successfully", blog: newBlog });
   } catch (error) {
