@@ -5,7 +5,6 @@ const blogSchema = new mongoose.Schema({
   shortdescription: { type: String, required: true },
   fulldescription: { type: String, required: true },
   facebook: { type: String, required: true },
-  threads: { type: String, required: true },
   States: { type: String, required: true },
   City: { type: String, required: true },
   img: { type: [], required: true },
