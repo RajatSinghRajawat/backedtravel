@@ -136,16 +136,20 @@ exports.forgotPassword = async (req, res) => {
         if (!user.status) {
             return res.status(400).json({ status: 0, message: "OTP not verified" });
         }
+
         const hashedPassword = await bcrypt.hash(password, 10);
-        user.password = hashedPassword;
-        user.Otp = null; // Clear OTP after successful password reset
-        await user.save();
+        await User.updateOne(
+            { email },
+            { password: hashedPassword, Otp: null }
+        );
+
         res.status(200).json({ status: 1, message: "Password reset successfully" });
     } catch (error) {
         console.error("Error resetting password", error);
         res.status(500).json({ status: 11, message: "Error resetting password", error });
     }
 };
+
 
 exports.register = async (req, res) => {
     try {
