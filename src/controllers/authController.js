@@ -115,16 +115,16 @@ exports.verifyOtp = async (req, res) => {
     try {
         const { email, otp } = req.body;
         const user = await User.findOne({ email });
-        console.log(user, "kk");
         if (!user) return res.status(404).json({ status: 0, message: "User not found" });
         if (user.Otp != otp) return res.status(400).json({ status: 0, message: "Invalid OTP" });
-        user.status = true;
-        await user.save();
+
+        await User.updateOne({ email }, { status: true }); // Bina validation ke update
         res.status(200).json({ status: 1, message: "OTP verified successfully" });
     } catch (error) {
         res.status(500).json({ status: 11, message: "Error verifying OTP", error });
     }
 };
+
 
 exports.forgotPassword = async (req, res) => {
     try {
