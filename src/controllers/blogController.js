@@ -4,7 +4,7 @@ const Blog = require("../models/blogModel");
 exports.createBlog = async (req, res) => {
   try {
 
-  const { title, shortdescription, fulldescription, facebook, States, City ,author} = req.body;
+    const { title, shortdescription, fulldescription, facebook, States, City, author } = req.body;
     console.log(req.body);
 
     const imgs = req.files ? req.files.map(file => file.filename) : [];
@@ -15,7 +15,7 @@ exports.createBlog = async (req, res) => {
       return res.status(400).json({ error: "All fields are required" });
     }
 
-    const newBlog = await Blog.create({ title, shortdescription, img: imgs, fulldescription, facebook, States, City , author });
+    const newBlog = await Blog.create({ title, shortdescription, img: imgs, fulldescription, facebook, States, City, author });
 
     res.status(201).json({ message: "Blog uploaded successfully", blog: newBlog });
   } catch (error) {
@@ -64,6 +64,53 @@ exports.addComment = async (req, res) => {
     res.status(500).json({ message: "Error adding comment", error: err.message });
   }
 };
+exports.editComment = async (req, res) => {
+  const blogId = req.params.blogId;
+  const commentId = req.params.commentId;
+  const { userId, text } = req.body;
+
+  try {
+    const blog = await Blog.findById(blogId);
+    if (!blog) return res.status(404).json({ message: "Blog not found" });
+
+    const comment = blog.comments.id(commentId);
+    if (!comment) return res.status(404).json({ message: "Comment not found" });
+
+    if (comment.user.toString() !== userId) {
+      return res.status(403).json({ message: "Unauthorized to edit this comment" });
+    }
+
+    comment.text = text;
+    await blog.save();
+
+    res.json({ message: "Comment updated", comments: blog.comments });
+  } catch (err) {
+    res.status(500).json({ message: "Error editing comment", error: err.message });
+  }
+};
+exports.deleteComment = async (req, res) => {
+  const blogId = req.params.blogId;
+  const commentId = req.params.commentId;
+  const { userId } = req.body;
+
+  try {
+    const blog = await Blog.findById(blogId);
+    if (!blog) return res.status(404).json({ message: "Blog not found" });
+
+    const comment = blog.comments.id(commentId);
+    if (!comment) return res.status(404).json({ message: "Comment not found" });
+
+    if (comment.user.toString() !== userId) {
+      return res.status(403).json({ message: "Unauthorized to delete this comment" });
+    }
+
+    await blog.save();
+
+    res.json({ message: "Comment deleted", comments: blog.comments });
+  } catch (err) {
+    res.status(500).json({ message: "Error deleting comment", error: err.message });
+  }
+};
 
 exports.getComments = async (req, res) => {
   try {
@@ -78,45 +125,6 @@ exports.getComments = async (req, res) => {
 
 
 
-
-
-// Get all blogs
-// exports.getAllBlogs = async (req, res) => {
-//   try {
-//     let { page = 1, limit = 10, States, City } = req.query;
-//     page = parseInt(page);
-//     limit = parseInt(limit);
-
-//     const query = {};
-
-//     // Apply filters if state or city is provided
-//     if (state) {
-//       query.States = { $regex: new RegExp(state, "i") }; 
-//     }
-//     if (city) {
-//       query.City = { $regex: new RegExp(city, "i") };
-//     }
-
-//     console.log("Query Object:", query); // Debugging
-
-//     const blogs = await Blog.find(query)
-//       .skip((page - 1) * limit)
-//       .limit(limit);
-//     console.log(blogs);
-
-//     const totalBlogs = await Blog.countDocuments(query);
-
-//     res.status(200).json({
-//       message: "Get all blogs",
-//       blogs,
-//       currentPage: page,
-//       totalPages: Math.ceil(totalBlogs / limit),
-//       totalBlogs,
-//     });
-//   } catch (error) {
-//     res.status(500).json({ error: "Internal Server Error" });
-//   }
-// };
 
 
 exports.getAllBlogs = async (req, res) => {
