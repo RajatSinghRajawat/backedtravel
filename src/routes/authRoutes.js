@@ -2,7 +2,7 @@ const express = require('express');
 const { register, login, updateUser, getUser, sendEmail, ChekEmail, verifyOtp, logout, forgotPassword, sendUserDetailsToEventCreator, adminregister, getAdmin } = require('../controllers/authController');
 const upload = require('../../multer');
 const { createBlog, getAllBlogs, getBlogById, deleteBlog, updateBlog, likeBlog, addComment, getComments, editComment, deleteComment } = require('../controllers/blogController');
-const { createTravelPlan, getAllTravelPlans, getTravelPlanById, updateTravelPlan, deleteTravelPlan } = require('../controllers/travelPlanController');
+const { createTravelPlan, getAllTravelPlans, getTravelPlanById, updateTravelPlan, deleteTravelPlan, likeTravelPlan, commentOnTravelPlan } = require('../controllers/travelPlanController');
 
 const router = express.Router();
 
@@ -33,12 +33,26 @@ router.delete("/comments/:commentId/:blogId", deleteComment);
 router.post("/addEvents",upload.array("img") ,  createTravelPlan);
 router.get("/getEvents", getAllTravelPlans);
 router.post("/sendUserDetailsToEventCreator", sendUserDetailsToEventCreator);
+router.get("/getevents/:id", getTravelPlanById);
+router.delete("/deleteblog/:id", deleteTravelPlan);
+router.put("/updateTravelPlan/:id", upload.array("img"), updateTravelPlan);
+router.post("/like/:id", likeTravelPlan);
+router.post("/comment/:id", commentOnTravelPlan);
+router.get("/comments/:id", getComments);
 
-// router.get("/:id", getTravelPlanById);
-// router.put("/:id", updateTravelPlan);
-// router.delete("/:id", deleteTravelPlan);
+
+
+
+
 
 router.post("/adminadd" , adminregister)
 router.post("/adminget" , getAdmin)
 
+
+
+
+
+
 module.exports = router;
+
+

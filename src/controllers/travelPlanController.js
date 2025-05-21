@@ -38,20 +38,28 @@ exports.createTravelPlan = async (req, res) => {
 
 exports.getAllTravelPlans = async (req, res) => {
   try {
-    let { page, limit, States, City } = req.query;
+    let { page, limit, States, City ,search} = req.query;
 
-    // Convert query parameters to numbers and set defaults
     page = parseInt(page) || 1;
     limit = parseInt(limit) || 10;
-
     const skip = (page - 1) * limit;
 
-    // Create filter object based on state and city
+    // Create filter object with regex for partial match
     let filter = {};
-    if (States) filter.States = States;
-    if (City) filter.City = City;
 
-    // Get total count for pagination metadata
+    if (States) {
+      filter.States = { $regex: States, $options: "i" }; // Case-insensitive search
+    }
+
+    if (City) {
+      filter.City = { $regex: City, $options: "i" };
+    }
+
+      if (search) {
+      query.title = { $regex: new RegExp(search, "i") }; // Search by title
+    }
+
+    // Count total matching documents
     const total = await TravelPlan.countDocuments(filter);
 
     // Fetch filtered travel plans with pagination
@@ -68,7 +76,91 @@ exports.getAllTravelPlans = async (req, res) => {
       },
     });
   } catch (error) {
+    console.error("Error fetching travel plans:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
+exports.getTravelPlanById = async (req, res) => {
+  try {
+    const travel = await TravelPlan.findById(req.params.id);
+    if (!travel) {
+      return res.status(404).json({ message: "Travel plan not found" });
+    }
+    res.status(200).json({ success: true, data: travel });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Update travel plan
+exports.updateTravelPlan = async (req, res) => {
+  try {
+    const updatedPlan = await TravelPlan.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    if (!updatedPlan) {
+      return res.status(404).json({ message: "Travel plan not found" });
+    }
+    res.status(200).json({ success: true, message: "Updated successfully", data: updatedPlan });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Delete travel plan
+exports.deleteTravelPlan = async (req, res) => {
+  try {
+    const deletedPlan = await TravelPlan.findByIdAndDelete(req.params.id);
+    if (!deletedPlan) {
+      return res.status(404).json({ message: "Travel plan not found" });
+    }
+    res.status(200).json({ success: true, message: "Deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Like a travel plan
+exports.likeTravelPlan = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const travel = await TravelPlan.findById(req.params.id);
+    if (!travel) return res.status(404).json({ message: "Travel plan not found" });
+
+    if (!travel.likes.includes(userId)) {
+      travel.likes.push(userId);
+    } else {
+      travel.likes = travel.likes.filter(id => id !== userId);
+    }
+
+    await travel.save();
+    res.status(200).json({ success: true, likes: travel.likes });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Add a comment
+exports.commentOnTravelPlan = async (req, res) => {
+  try {
+    const { userId, commentText } = req.body;
+    const travel = await TravelPlan.findById(req.params.id);
+    if (!travel) return res.status(404).json({ message: "Travel plan not found" });
+
+    const comment = {
+      userId,
+      commentText,
+      date: new Date()
+    };
+
+    travel.comments.push(comment);
+    await travel.save();
+
+    res.status(200).json({ success: true, comments: travel.comments });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

@@ -42,7 +42,14 @@ const TravelPlanSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     // required: true
-  }
+  },
+  
+  likes: [{ type: String }], // Array of userIds
+  comments: [{
+    userId: String,
+    commentText: String,
+    date: { type: Date, default: Date.now }
+  }]
 
 });
 
