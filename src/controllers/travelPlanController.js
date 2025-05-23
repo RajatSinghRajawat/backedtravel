@@ -63,7 +63,7 @@ exports.getAllTravelPlans = async (req, res) => {
     const total = await TravelPlan.countDocuments(filter);
 
     // Fetch filtered travel plans with pagination
-    const travel = await TravelPlan.find(filter).skip(skip).limit(limit);
+    const travel = await TravelPlan.find(filter).skip(skip).limit(limit).sort({ createdAt: -1 });
 
     res.status(200).json({
       message: "Get all Events",
