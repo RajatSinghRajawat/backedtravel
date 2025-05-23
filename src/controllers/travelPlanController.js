@@ -38,7 +38,7 @@ exports.createTravelPlan = async (req, res) => {
 
 exports.getAllTravelPlans = async (req, res) => {
   try {
-    let { page, limit, States, City ,search} = req.query;
+    let { page, limit, States, City, search } = req.query;
 
     page = parseInt(page) || 1;
     limit = parseInt(limit) || 10;
@@ -48,22 +48,25 @@ exports.getAllTravelPlans = async (req, res) => {
     let filter = {};
 
     if (States) {
-      filter.States = { $regex: States, $options: "i" }; // Case-insensitive search
+      filter.States = { $regex: States, $options: "i" }; // Case-insensitive
     }
 
     if (City) {
       filter.City = { $regex: City, $options: "i" };
     }
 
-      if (search) {
-      query.title = { $regex: new RegExp(search, "i") }; // Search by title
+    if (search) {
+      filter.title = { $regex: new RegExp(search, "i") }; // Fix: use filter, not query
     }
 
     // Count total matching documents
     const total = await TravelPlan.countDocuments(filter);
 
-    // Fetch filtered travel plans with pagination
-    const travel = await TravelPlan.find(filter).skip(skip).limit(limit).sort({ createdAt: -1 });
+    // Fetch filtered travel plans with pagination and sort by latest
+    const travel = await TravelPlan.find(filter)
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 }); // Latest first
 
     res.status(200).json({
       message: "Get all Events",
@@ -80,6 +83,7 @@ exports.getAllTravelPlans = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
 
 exports.getTravelPlanById = async (req, res) => {
   try {
