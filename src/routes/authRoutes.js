@@ -2,7 +2,7 @@ const express = require('express');
 const { register, login, updateUser, getUser, sendEmail, ChekEmail, verifyOtp, logout, forgotPassword, sendUserDetailsToEventCreator, adminregister, getAdmin } = require('../controllers/authController');
 const upload = require('../../multer');
 const { createBlog, getAllBlogs, getBlogById, deleteBlog, updateBlog, likeBlog, addComment, getComments, editComment, deleteComment } = require('../controllers/blogController');
-const { createTravelPlan, getAllTravelPlans, getTravelPlanById, updateTravelPlan, deleteTravelPlan, likeTravelPlan, commentOnTravelPlan, geteventsComments } = require('../controllers/travelPlanController');
+const { createTravelPlan, getAllTravelPlans, getTravelPlanById, updateTravelPlan, deleteTravelPlan, likeTravelPlan, commentOnTravelPlan, geteventsComments ,editComment, deleteComment  } = require('../controllers/travelPlanController');
 
 const router = express.Router();
 
@@ -39,11 +39,12 @@ router.put("/updateTravelPlan/:id", upload.array("img"), updateTravelPlan);
 router.post("/likes/:id", likeTravelPlan);
 router.post("/commentevent/:id", commentOnTravelPlan);
 router.get("/commentsevent/:id", geteventsComments);
+router.put("/comments/:commentId/:blogId", editComment);
+router.delete("/deletecomments/:commentId/:blogId", deleteComment);
 
 
 
-
-
+ 
 
 router.post("/adminadd" , adminregister)
 router.post("/adminget" , getAdmin)
