@@ -185,7 +185,7 @@ exports.geteventsComments = async (req, res) => {
   }
 };
 
-exports.editComment = async (req, res) => {
+exports.editevntsComment = async (req, res) => {
   const travelPlanId = req.params.travelPlanId; // Changed from blogId to travelPlanId
   const commentId = req.params.commentId;
   const { userId, text } = req.body;
@@ -211,7 +211,7 @@ exports.editComment = async (req, res) => {
 };
 
 // Delete a comment
-exports.deleteComment = async (req, res) => {
+exports.deleteeventsComment = async (req, res) => {
   const travelPlanId = req.params.travelPlanId; // Changed from blogId to travelPlanId
   const commentId = req.params.commentId;
   const { userId } = req.body;
