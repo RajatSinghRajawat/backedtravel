@@ -39,7 +39,7 @@ router.put("/updateTravelPlan/:id", upload.array("img"), updateTravelPlan);
 router.post("/likes/:id", likeTravelPlan);
 router.post("/commentevent/:id", commentOnTravelPlan);
 router.get("/commentsevent/:id", geteventsComments);
-router.put("/comments/:commentId/:eventId", editevntsComment);
+router.put("/editeventscomments/:commentId/:eventId", editevntsComment);
 router.delete("/deleteeventscomments/:commentId/:eventId", deleteeventsComment);
 
 
