@@ -134,7 +134,7 @@ exports.likeTravelPlan = async (req, res) => {
     const travel = await TravelPlan.findById(req.params.id);
     if (!travel) return res.status(404).json({ message: "Travel plan not found" });
 
-  if (travel.likes.includes(userId)) {
+    if (travel.likes.includes(userId)) {
       travel.likes.pull(userId);
       await travel.save();
       return res.json({ message: "Unliked", likes: travel.likes.length });
@@ -185,4 +185,55 @@ exports.geteventsComments = async (req, res) => {
   }
 };
 
+exports.editComment = async (req, res) => {
+  const travelPlanId = req.params.travelPlanId; // Changed from blogId to travelPlanId
+  const commentId = req.params.commentId;
+  const { userId, text } = req.body;
 
+  try {
+    const travel = await TravelPlan.findById(travelPlanId);
+    if (!travel) return res.status(404).json({ message: "Travel plan not found" });
+
+    const comment = travel.comments.id(commentId);
+    if (!comment) return res.status(404).json({ message: "Comment not found" });
+
+    if (comment.user.toString() !== userId) {
+      return res.status(403).json({ message: "Unauthorized to edit this comment" });
+    }
+
+    comment.text = text;
+    await travel.save();
+
+    res.json({ message: "Comment updated", comments: travel.comments });
+  } catch (err) {
+    res.status(500).json({ message: "Error editing comment", error: err.message });
+  }
+};
+
+// Delete a comment
+exports.deleteComment = async (req, res) => {
+  const travelPlanId = req.params.travelPlanId; // Changed from blogId to travelPlanId
+  const commentId = req.params.commentId;
+  const { userId } = req.body;
+
+  try {
+    const travel = await TravelPlan.findById(travelPlanId);
+    if (!travel) return res.status(404).json({ message: "Travel plan not found" });
+
+    const comment = travel.comments.id(commentId);
+    if (!comment) return res.status(404).json({ message: "Comment not found" });
+
+    if (comment.user.toString() !== userId) {
+      return res.status(403).json({ message: "Unauthorized to delete this comment" });
+    }
+
+    // Remove the comment from the comments array
+    travel.comments = travel.comments.filter(c => c._id.toString() !== commentId);
+
+    await travel.save();
+
+    res.json({ message: "Comment deleted", comments: travel.comments });
+  } catch (err) {
+    res.status(500).json({ message: "Error deleting comment", error: err.message });
+  }
+};
