@@ -2,7 +2,7 @@ const express = require('express');
 const { register, login, updateUser, getUser, sendEmail, ChekEmail, verifyOtp, logout, forgotPassword, sendUserDetailsToEventCreator, adminregister, getAdmin } = require('../controllers/authController');
 const upload = require('../../multer');
 const { createBlog, getAllBlogs, getBlogById, deleteBlog, updateBlog, likeBlog, addComment, getComments, editComment, deleteComment } = require('../controllers/blogController');
-const { createTravelPlan, getAllTravelPlans, getTravelPlanById, updateTravelPlan, deleteTravelPlan, likeTravelPlan, commentOnTravelPlan } = require('../controllers/travelPlanController');
+const { createTravelPlan, getAllTravelPlans, getTravelPlanById, updateTravelPlan, deleteTravelPlan, likeTravelPlan, commentOnTravelPlan, geteventsComments } = require('../controllers/travelPlanController');
 
 const router = express.Router();
 
@@ -26,7 +26,7 @@ router.post("/like/:id", likeBlog);
 router.post("/comment/:id", addComment);
 router.get("/comments/:id", getComments);
 router.put("/comments/:commentId/:blogId", editComment);
-router.delete("/comments/:commentId/:blogId", deleteComment);
+router.delete("/deletecomments/:commentId/:blogId", deleteComment);
 
 
 
@@ -36,9 +36,9 @@ router.post("/sendUserDetailsToEventCreator", sendUserDetailsToEventCreator);
 router.get("/getevents/:id", getTravelPlanById);
 router.delete("/deleteblog/:id", deleteTravelPlan);
 router.put("/updateTravelPlan/:id", upload.array("img"), updateTravelPlan);
-router.post("/like/:id", likeTravelPlan);
-router.post("/comment/:id", commentOnTravelPlan);
-router.get("/comments/:id", getComments);
+router.post("/likes/:id", likeTravelPlan);
+router.post("/commentevent/:id", commentOnTravelPlan);
+router.get("/commentsevent/:id", geteventsComments);
 
 
 

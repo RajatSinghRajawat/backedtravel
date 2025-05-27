@@ -27,7 +27,7 @@ exports.createBlog = async (req, res) => {
 
 
 exports.likeBlog = async (req, res) => {
-  const { userId } = req.body; // or from token
+  const { userId } = req.body;
   const blogId = req.params.id;
 
   try {

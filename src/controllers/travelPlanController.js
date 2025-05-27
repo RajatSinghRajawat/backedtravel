@@ -3,7 +3,7 @@ const TravelPlan = require("../models/TravelPlan");
 // Create a new travel plan
 exports.createTravelPlan = async (req, res) => {
   try {
-    const { destination, travelBuddyGender, startDate, endDate, transport, budget, travelBuddyAge, travelAuthor, travelDescription, States, City ,creator } = req.body;
+    const { destination, travelBuddyGender, startDate, endDate, transport, budget, travelBuddyAge, travelAuthor, travelDescription, States, City, creator } = req.body;
     console.log(req.body);
 
     // If multiple images are uploaded, store their filenames in an array
@@ -134,10 +134,14 @@ exports.likeTravelPlan = async (req, res) => {
     const travel = await TravelPlan.findById(req.params.id);
     if (!travel) return res.status(404).json({ message: "Travel plan not found" });
 
-    if (!travel.likes.includes(userId)) {
-      travel.likes.push(userId);
+  if (travel.likes.includes(userId)) {
+      travel.likes.pull(userId);
+      await travel.save();
+      return res.json({ message: "Unliked", likes: travel.likes.length });
     } else {
-      travel.likes = travel.likes.filter(id => id !== userId);
+      travel.likes.push(userId);
+      await travel.save();
+      return res.json({ message: "Liked", likes: travel.likes.length });
     }
 
     await travel.save();
@@ -150,17 +154,17 @@ exports.likeTravelPlan = async (req, res) => {
 // Add a comment
 exports.commentOnTravelPlan = async (req, res) => {
   try {
-    const { userId, commentText } = req.body;
+    const { userId, text } = req.body;
     const travel = await TravelPlan.findById(req.params.id);
-    if (!travel) return res.status(404).json({ message: "Travel plan not found" });
+    if (!travel) return res.status(404).json({ message: "evnts not found" });
 
     const comment = {
       userId,
-      commentText,
+      text,
       date: new Date()
     };
 
-    travel.comments.push(comment);
+    travel.comments.push({ user: userId, text });
     await travel.save();
 
     res.status(200).json({ success: true, comments: travel.comments });
@@ -168,3 +172,17 @@ exports.commentOnTravelPlan = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+
+exports.geteventsComments = async (req, res) => {
+  try {
+    const events = await TravelPlan.findById(req.params.id).populate("comments.user", "name");
+    if (!events) return res.status(404).json({ message: "Events comments not found" });
+
+    res.json({ comments: events.comments });
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching comments", error: err.message });
+  }
+};
+
+

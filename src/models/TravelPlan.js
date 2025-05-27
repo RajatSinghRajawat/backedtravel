@@ -1,5 +1,12 @@
 const mongoose = require("mongoose");
 
+const commentSchema = new mongoose.Schema({
+  user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  text: String,
+  createdAt: { type: Date, default: Date.now },
+});
+
+
 const TravelPlanSchema = new mongoose.Schema({
   destination: { type: String },
 
@@ -43,13 +50,9 @@ const TravelPlanSchema = new mongoose.Schema({
     ref: 'User',
     // required: true
   },
-  
-  likes: [{ type: String }], // Array of userIds
-  comments: [{
-    userId: String,
-    commentText: String,
-    date: { type: Date, default: Date.now }
-  }]
+
+  likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  comments: [commentSchema],
 
 });
 
