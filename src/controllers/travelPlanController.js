@@ -186,12 +186,12 @@ exports.geteventsComments = async (req, res) => {
 };
 
 exports.editevntsComment = async (req, res) => {
-  const travelPlanId = req.params.travelPlanId; // Changed from blogId to travelPlanId
+  const eventId = req.params.eventId; // Changed from blogId to eventId
   const commentId = req.params.commentId;
   const { userId, text } = req.body;
 
   try {
-    const travel = await TravelPlan.findById(travelPlanId);
+    const travel = await TravelPlan.findById(eventId);
     if (!travel) return res.status(404).json({ message: "Travel plan not found" });
 
     const comment = travel.comments.id(commentId);
@@ -212,12 +212,12 @@ exports.editevntsComment = async (req, res) => {
 
 // Delete a comment
 exports.deleteeventsComment = async (req, res) => {
-  const travelPlanId = req.params.travelPlanId; // Changed from blogId to travelPlanId
+  const eventId = req.params.eventId; // Changed from blogId to travelPlanId
   const commentId = req.params.commentId;
   const { userId } = req.body;
 
   try {
-    const travel = await TravelPlan.findById(travelPlanId);
+    const travel = await TravelPlan.findById(eventId);
     if (!travel) return res.status(404).json({ message: "Travel plan not found" });
 
     const comment = travel.comments.id(commentId);
