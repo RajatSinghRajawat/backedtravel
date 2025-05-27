@@ -104,6 +104,10 @@ exports.deleteComment = async (req, res) => {
       return res.status(403).json({ message: "Unauthorized to delete this comment" });
     }
 
+    // Remove the comment from the comments array
+    blog.comments = blog.comments.filter(c => c._id.toString() !== commentId);
+    // OR you can use: blog.comments.id(commentId).remove();
+
     await blog.save();
 
     res.json({ message: "Comment deleted", comments: blog.comments });

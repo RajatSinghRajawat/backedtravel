@@ -34,7 +34,7 @@ router.post("/addEvents",upload.array("img") ,  createTravelPlan);
 router.get("/getEvents", getAllTravelPlans);
 router.post("/sendUserDetailsToEventCreator", sendUserDetailsToEventCreator);
 router.get("/getevents/:id", getTravelPlanById);
-router.delete("/deleteblog/:id", deleteTravelPlan);
+router.delete("/deleteTravelPlan/:id", deleteTravelPlan);
 router.put("/updateTravelPlan/:id", upload.array("img"), updateTravelPlan);
 router.post("/likes/:id", likeTravelPlan);
 router.post("/commentevent/:id", commentOnTravelPlan);
