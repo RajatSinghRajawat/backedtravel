@@ -37,19 +37,79 @@ exports.createTravelPlan = async (req, res) => {
   }
 };
 
+// exports.getAllTravelPlans = async (req, res) => {
+//   try {
+//     let { page, limit, States, City, search } = req.query;
+
+//     page = parseInt(page) || 1;
+//     limit = parseInt(limit) || 10;
+//     const skip = (page - 1) * limit;
+
+//     // Create filter object with regex for partial match
+//     let filter = {};
+
+//     if (States) {
+//       filter.States = { $regex: States, $options: "i" }; // Case-insensitive
+//     }
+
+//     if (City) {
+//       filter.City = { $regex: City, $options: "i" };
+//     }
+
+//     if (search) {
+//       filter.title = { $regex: new RegExp(search, "i") }; // Fix: use filter, not query
+//     }
+
+//     // Count total matching documents
+//     const total = await TravelPlan.countDocuments(filter);
+
+//     // Fetch filtered travel plans with pagination and sort by latest
+//     const travel = await TravelPlan.find(filter)
+//       .skip(skip)
+//       .limit(limit)
+//       .sort({ createdAt: -1 }); // Latest first
+
+//     res.status(200).json({
+//       message: "Get all Events",
+//       travel,
+//       pagination: {
+//         total,
+//         page,
+//         limit,
+//         totalPages: Math.ceil(total / limit),
+//       },
+//     });
+//   } catch (error) {
+//     console.error("Error fetching travel plans:", error);
+//     res.status(500).json({ error: "Internal Server Error" });
+//   }
+// };
+
+
+
+
+
+
+
+
+
+
+
+
+
 exports.getAllTravelPlans = async (req, res) => {
   try {
-    let { page, limit, States, City, search } = req.query;
+    let { page, limit, States, City, search, mostLiked } = req.query;
 
     page = parseInt(page) || 1;
     limit = parseInt(limit) || 10;
     const skip = (page - 1) * limit;
 
-    // Create filter object with regex for partial match
+    // Filters
     let filter = {};
 
     if (States) {
-      filter.States = { $regex: States, $options: "i" }; // Case-insensitive
+      filter.States = { $regex: States, $options: "i" };
     }
 
     if (City) {
@@ -57,17 +117,42 @@ exports.getAllTravelPlans = async (req, res) => {
     }
 
     if (search) {
-      filter.title = { $regex: new RegExp(search, "i") }; // Fix: use filter, not query
+      filter.title = { $regex: new RegExp(search, "i") };
     }
 
-    // Count total matching documents
     const total = await TravelPlan.countDocuments(filter);
 
-    // Fetch filtered travel plans with pagination and sort by latest
+    // 🧠 Use aggregation if mostLiked=true
+    if (mostLiked === "true") {
+      const travel = await TravelPlan.aggregate([
+        { $match: filter },
+        {
+          $addFields: {
+            likesCount: { $size: "$likes" }
+          }
+        },
+        { $sort: { likesCount: -1 } },
+        { $skip: skip },
+        { $limit: limit }
+      ]);
+
+      return res.status(200).json({
+        message: "Get most liked Events",
+        travel,
+        pagination: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit),
+        },
+      });
+    }
+
+    // Default: sort by createdAt if not mostLiked
     const travel = await TravelPlan.find(filter)
       .skip(skip)
       .limit(limit)
-      .sort({ createdAt: -1 }); // Latest first
+      .sort({ createdAt: -1 });
 
     res.status(200).json({
       message: "Get all Events",
@@ -84,6 +169,13 @@ exports.getAllTravelPlans = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+
+
+
+
+
+
 
 
 exports.getTravelPlanById = async (req, res) => {
@@ -151,6 +243,26 @@ exports.likeTravelPlan = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+exports.getMostLikedTravelPlans = async (req, res) => {
+  try {
+    const plans = await TravelPlan.aggregate([
+      {
+        $addFields: {
+          likesCount: { $size: "$likes" }
+        }
+      },
+      {
+        $sort: { likesCount: -1 } // Sort by most liked
+      }
+    ]);
+
+    res.status(200).json({ success: true, data: plans });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 
 // Add a comment
 exports.commentOnTravelPlan = async (req, res) => {

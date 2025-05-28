@@ -2,7 +2,7 @@ const express = require('express');
 const { register, login, updateUser, getUser, sendEmail, ChekEmail, verifyOtp, logout, forgotPassword, sendUserDetailsToEventCreator, adminregister, getAdmin } = require('../controllers/authController');
 const upload = require('../../multer');
 const { createBlog, getAllBlogs, getBlogById, deleteBlog, updateBlog, likeBlog, addComment, getComments, editComment, deleteComment } = require('../controllers/blogController');
-const { createTravelPlan, getAllTravelPlans, getTravelPlanById, updateTravelPlan, deleteTravelPlan, likeTravelPlan, commentOnTravelPlan, geteventsComments, editevntsComment, deleteeventsComment } = require('../controllers/travelPlanController');
+const { createTravelPlan, getAllTravelPlans, getTravelPlanById, updateTravelPlan, deleteTravelPlan, likeTravelPlan, commentOnTravelPlan, geteventsComments, editevntsComment, deleteeventsComment, getMostLikedTravelPlans } = require('../controllers/travelPlanController');
 
 const router = express.Router();
 
@@ -10,8 +10,8 @@ router.post('/register', upload.single('img'), register);
 router.post('/login', login);
 router.get('/user/:id', getUser);
 router.put('/update/:id', upload.single('img'), updateUser);
-router.post('/sendemail',sendEmail)
-router.post('/checkemail',ChekEmail)
+router.post('/sendemail', sendEmail)
+router.post('/checkemail', ChekEmail)
 router.post("/verifyotp", verifyOtp);
 router.post("/logout", logout);
 router.post("/forgotpassword", forgotPassword)
@@ -30,7 +30,7 @@ router.delete("/deletecomments/:commentId/:blogId", deleteComment);
 
 
 
-router.post("/addEvents",upload.array("img") ,  createTravelPlan);
+router.post("/addEvents", upload.array("img"), createTravelPlan);
 router.get("/getEvents", getAllTravelPlans);
 router.post("/sendUserDetailsToEventCreator", sendUserDetailsToEventCreator);
 router.get("/getevents/:id", getTravelPlanById);
@@ -41,13 +41,14 @@ router.post("/commentevent/:id", commentOnTravelPlan);
 router.get("/commentsevent/:id", geteventsComments);
 router.put("/editeventscomments/:commentId/:eventId", editevntsComment);
 router.delete("/deleteeventscomments/:commentId/:eventId", deleteeventsComment);
+router.delete("/getMostLikedTravelPlans", getMostLikedTravelPlans);
 
 
 
- 
 
-router.post("/adminadd" , adminregister)
-router.post("/adminget" , getAdmin)
+
+router.post("/adminadd", adminregister)
+router.post("/adminget", getAdmin)
 
 
 
