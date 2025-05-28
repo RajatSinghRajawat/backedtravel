@@ -18,9 +18,9 @@ const TravelPlanSchema = new mongoose.Schema({
     enum: ["Car", "Bus", "Train", "Flight", "Bike", "Boat"]
   },
   interests: {
-    type: [String],
+    type: Array,
     required: true,
-    enum: ["Mountains", "Trekking", "Beaches", "Wildlife", "City Tour", "Adventure Sports", "Cultural"]
+    // enum: ["Mountains", "Trekking", "Beaches", "Wildlife", "City Tour", "Adventure Sports", "Cultural"]
   },
   budget: { type: Number, required: true },
   travelBuddyGender: {
