@@ -88,15 +88,6 @@ exports.createTravelPlan = async (req, res) => {
 
 
 
-
-
-
-
-
-
-
-
-
 exports.getAllTravelPlans = async (req, res) => {
   try {
     let { page, limit, States, City, search, mostLiked } = req.query;

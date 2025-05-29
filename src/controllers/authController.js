@@ -278,50 +278,77 @@ exports.sendUserDetailsToEventCreator = async (req, res) => {
     try {
         const { eventId, userId } = req.body;
 
-        // Find the event by ID
+        // Find the event by ID and populate the creator's details
         const event = await TravelPlan.findById(eventId).populate('creator');
         if (!event) {
             return res.status(404).json({ status: 0, message: 'Event not found' });
         }
 
-        // Find the user who clicked the button
+        // Find the user who expressed interest
         const user = await User.findById(userId).select('name email city country travelStyle');
         if (!user) {
             return res.status(404).json({ status: 0, message: 'User not found' });
         }
 
-        // Get the event creator's email
+        // Email details
         const creatorEmail = event.creator.email;
-
-        // Prepare email content
         const subject = `New Interest in Your Event: ${event.title}`;
-        const text = `A user has shown interest in your event "${event.title}".\n\nUser Details:\nName: ${user.name}\nEmail: ${user.email}\nCity: ${user.city || 'N/A'}\nCountry: ${user.country || 'N/A'}\nTravel Style: ${user.travelStyle || 'N/A'}`;
-        const html = `
-        <div style="font-family: Arial, sans-serif; padding: 20px;">
-          <h2 style="color: #3498db;">New Interest in Your Event!</h2>
-          <p>A user has shown interest in your event: <strong>${event.title}</strong></p>
-          <h3>User Details:</h3>
-          <ul>
-            <li><strong>Name:</strong> ${user.name}</li>
-            <li><strong>Email:</strong> ${user.email}</li>
-            <li><strong>City:</strong> ${user.city || 'N/A'}</li>
-            <li><strong>Country:</strong> ${user.country || 'N/A'}</li>
-            <li><strong>Travel Style:</strong> ${user.travelStyle || 'N/A'}</li>
-          </ul>
-          <p style="color: #7f8c8d;">You can contact the user for further details.</p>
-          <p style="color: #7f8c8d;">— The Solo Trip Team</p>
-        </div>
-      `;
+        const text = `A user has shown interest in your event "${event.interests}".\n\nUser Details:\nName: ${user.name}\nEmail: ${user.email}\nCity: ${user.city || 'N/A'}\nCountry: ${user.country || 'N/A'}\nTravel Style: ${user.travelStyle || 'N/A'}`;
 
-        // Send email to the event creator
+        const html = `
+            <div style="font-family: Arial, sans-serif; background: #f9f9f9; padding: 20px;">
+                <div style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; padding: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+                    <h2 style="color: #2c3e50;">🚀 Someone is Interested in Your Travel Event!</h2>
+                    <p style="color: #555;">A user has shown interest in your event: <strong>${event.title}</strong></p>
+                    
+                    <h3 style="color: #3498db;">User Details</h3>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr>
+                            <td style="padding: 8px; font-weight: bold;">Name:</td>
+                            <td style="padding: 8px;">${user.name}</td>
+                        </tr>
+                        <tr style="background: #f2f2f2;">
+                            <td style="padding: 8px; font-weight: bold;">Email:</td>
+                            <td style="padding: 8px;">${user.email}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; font-weight: bold;">City:</td>
+                            <td style="padding: 8px;">${user.city || 'N/A'}</td>
+                        </tr>
+                        <tr style="background: #f2f2f2;">
+                            <td style="padding: 8px; font-weight: bold;">Country:</td>
+                            <td style="padding: 8px;">${user.country || 'N/A'}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; font-weight: bold;">Travel Style:</td>
+                            <td style="padding: 8px;">${user.travelStyle || 'N/A'}</td>
+                        </tr>
+                    </table>
+
+                    <p style="margin-top: 20px; color: #7f8c8d;">Feel free to connect with this user to plan your trip together!</p>
+                    <p style="color: #95a5a6; font-size: 14px;">— The Solo Trip Team</p>
+                </div>
+            </div>
+        `;
+
+        // Send the email
         await sendEmail(creatorEmail, subject, text, html);
 
-        res.status(200).json({ status: 1, message: 'User details sent to event creator successfully' });
+        return res.status(200).json({
+            status: 1,
+            message: 'User details sent to event creator successfully'
+        });
+
     } catch (error) {
         console.error('Error sending user details:', error);
-        res.status(500).json({ status: 0, message: 'Error sending user details', error });
+        return res.status(500).json({
+            status: 0,
+            message: 'Error sending user details',
+            error: error.message
+        });
     }
 };
+
 
 
 
