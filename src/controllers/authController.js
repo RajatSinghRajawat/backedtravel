@@ -278,8 +278,9 @@ exports.sendUserDetailsToEventCreator = async (req, res) => {
     try {
         const { eventId, userId } = req.body;
 
-        // Find the event by ID and populate the creator's details
         const event = await TravelPlan.findById(eventId).populate('creator');
+        console.log(event,"event");
+        
         if (!event) {
             return res.status(404).json({ status: 0, message: 'Event not found' });
         }
@@ -292,8 +293,8 @@ exports.sendUserDetailsToEventCreator = async (req, res) => {
 
         // Email details
         const creatorEmail = event.creator.email;
-        const subject = `New Interest in Your Event: ${user.name}`;
-        const text = `A user has shown interest in your event ${user.name}.\n\nUser Details:\nName: ${user.name}\nEmail: ${user.email}\nCity: ${user.city || 'N/A'}\nCountry: ${user.country || 'N/A'}\nTravel Style: ${user.travelStyle || 'N/A'}`;
+        const subject = `New Interest in Your Event: ${event.interests}`;
+        const text = `A user has shown interest in your event ${event.interests}.\n\nUser Details:\nName: ${user.name}\nEmail: ${user.email}\nCity: ${user.city || 'N/A'}\nCountry: ${user.country || 'N/A'}\nTravel Style: ${user.travelStyle || 'N/A'}`;
 
         const html = `
             <div style="font-family: Arial, sans-serif; background: #f9f9f9; padding: 20px;">
@@ -322,6 +323,18 @@ exports.sendUserDetailsToEventCreator = async (req, res) => {
                         <tr>
                             <td style="padding: 8px; font-weight: bold;">Travel Style:</td>
                             <td style="padding: 8px;">${user.travelStyle || 'N/A'}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; font-weight: bold;">Budget Range:</td>
+                            <td style="padding: 8px;">${user.budgetRange || 'N/A'}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; font-weight: bold;">foodPreference:</td>
+                            <td style="padding: 8px;">${user.foodPreference || 'N/A'}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; font-weight: bold;">Activity Interests:</td>
+                            <td style="padding: 8px;">${user.hiking || 'N/A'}</td>
                         </tr>
                     </table>
 
