@@ -300,7 +300,7 @@ exports.sendUserDetailsToEventCreator = async (req, res) => {
             <div style="font-family: Arial, sans-serif; background: #f9f9f9; padding: 20px;">
                 <div style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; padding: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
                     <h2 style="color: #2c3e50;">🚀 Someone is Interested in Your Travel Event!</h2>
-                    <p style="color: #555;">A user has shown interest in your event: <strong>${user.name}</strong></p>
+                    <p style="color: #555;">A user has shown interest in your event: <strong>${event.interests}</strong></p>
                     
                     <h3 style="color: #3498db;">User Details</h3>
                     <table style="width: 100%; border-collapse: collapse;">
@@ -324,18 +324,7 @@ exports.sendUserDetailsToEventCreator = async (req, res) => {
                             <td style="padding: 8px; font-weight: bold;">Travel Style:</td>
                             <td style="padding: 8px;">${user.travelStyle || 'N/A'}</td>
                         </tr>
-                        <tr>
-                            <td style="padding: 8px; font-weight: bold;">Budget Range:</td>
-                            <td style="padding: 8px;">${user.budgetRange || 'N/A'}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 8px; font-weight: bold;">foodPreference:</td>
-                            <td style="padding: 8px;">${user.foodPreference || 'N/A'}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 8px; font-weight: bold;">Activity Interests:</td>
-                            <td style="padding: 8px;">${user.hiking || 'N/A'}</td>
-                        </tr>
+                       
                     </table>
 
                     <p style="margin-top: 20px; color: #7f8c8d;">Feel free to connect with this user to plan your trip together!</p>
