@@ -293,7 +293,7 @@ exports.sendUserDetailsToEventCreator = async (req, res) => {
         // Email details
         const creatorEmail = event.creator.email;
         const subject = `New Interest in Your Event: ${user.name}`;
-        const text = `A user has shown interest in your event "${user.name}".\n\nUser Details:\nName: ${user.name}\nEmail: ${user.email}\nCity: ${user.city || 'N/A'}\nCountry: ${user.country || 'N/A'}\nTravel Style: ${user.travelStyle || 'N/A'}`;
+        const text = `A user has shown interest in your event ${user.name}.\n\nUser Details:\nName: ${user.name}\nEmail: ${user.email}\nCity: ${user.city || 'N/A'}\nCountry: ${user.country || 'N/A'}\nTravel Style: ${user.travelStyle || 'N/A'}`;
 
         const html = `
             <div style="font-family: Arial, sans-serif; background: #f9f9f9; padding: 20px;">
