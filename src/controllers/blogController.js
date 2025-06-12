@@ -9,7 +9,6 @@ exports.createBlog = async (req, res) => {
 
     const imgs = req.files ? req.files.map(file => file.filename) : [];
 
-    console.log(imgs);
 
     if (!title || !shortdescription || !fulldescription || !imgs || !facebook || !States || !City || !author) {
       return res.status(400).json({ error: "All fields are required" });
@@ -23,9 +22,6 @@ exports.createBlog = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
-
-
 exports.likeBlog = async (req, res) => {
   const { userId } = req.body;
   const blogId = req.params.id;
@@ -47,8 +43,6 @@ exports.likeBlog = async (req, res) => {
     res.status(500).json({ message: "Error updating like", error: err.message });
   }
 };
-
-
 exports.addComment = async (req, res) => {
   const blogId = req.params.id;
   const { userId, text } = req.body;
@@ -125,17 +119,13 @@ exports.getComments = async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: "Error fetching comments", error: err.message });
   }
-};
-
-
-
-
+}
 
 exports.getAllBlogs = async (req, res) => {
   console.log("Received Query:", req.query);
 
   try {
-    let { page = 1, limit = 10, States, City, search } = req.query;
+    let { page = 1, limit = 10, States, City, search, userid } = req.query;
     page = parseInt(page);
     limit = parseInt(limit);
 
@@ -151,6 +141,10 @@ exports.getAllBlogs = async (req, res) => {
 
     if (search) {
       query.title = { $regex: new RegExp(search, "i") }; // Search by title
+    }
+
+    if (userid) {
+      query.userid = userid; // Filter by userid
     }
 
     console.log("Generated Query:", query); // Debugging
@@ -174,12 +168,6 @@ exports.getAllBlogs = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
-
-
-
-
-
 // Get single blog by ID
 exports.getBlogById = async (req, res) => {
   try {
@@ -210,7 +198,6 @@ exports.deleteBlog = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
 // Update blog by ID 
 exports.updateBlog = async (req, res) => {
   try {
