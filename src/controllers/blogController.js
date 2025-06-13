@@ -147,7 +147,6 @@ exports.getAllBlogs = async (req, res) => {
       query.userid = userid; // Filter by userid
     }
 
-    console.log("Generated Query:", query); // Debugging
 
     const blogs = await Blog.find(query)
       .sort({ createdAt: -1 })
@@ -155,6 +154,7 @@ exports.getAllBlogs = async (req, res) => {
       .limit(limit);
 
     const totalBlogs = await Blog.countDocuments(query);
+console.log(totalBlogs);
 
     res.status(200).json({
       message: "Get all blogs",

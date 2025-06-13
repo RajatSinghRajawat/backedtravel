@@ -19,6 +19,7 @@ const blogSchema = new mongoose.Schema({
   img: { type: [], required: true },
   likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   comments: [commentSchema],
+  userid: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }
 
 }, { timestamps: true });
 
