@@ -1,0 +1,22 @@
+const jwt = require("jsonwebtoken");
+
+const verifyToken = (req, res, next) => {
+  const token = req.header("Authorization")?.replace("Bearer ", "");
+
+  if (!token) {
+    return res.status(401).json({ error: "No token provided" });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = { _id: decoded.userId }; // ✅ Correct: normalize _id
+    console.log(decoded,"dsfd");
+    
+    next();
+  } catch (error) {
+    console.error("JWT Error:", error);
+    return res.status(401).json({ error: "Invalid token" });
+  }
+};
+
+module.exports = verifyToken;

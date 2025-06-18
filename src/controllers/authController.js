@@ -158,7 +158,7 @@ exports.register = async (req, res) => {
 
         const user = await User.findOne({ email });
 
-        const token = jwt.sign({ userId: user._id }, "tew", { expiresIn: '1d' });
+        const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
         user.password = hashedPassword;
         user.token = token;
@@ -184,7 +184,7 @@ exports.login = async (req, res) => {
 
         if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
-        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
         res.json({ message: "Login successful", token, user });
     } catch (error) {
         res.status(500).json({ message: "Error logging in", error });
@@ -279,8 +279,8 @@ exports.sendUserDetailsToEventCreator = async (req, res) => {
         const { eventId, userId } = req.body;
 
         const event = await TravelPlan.findById(eventId).populate('creator');
-        console.log(event,"event");
-        
+        console.log(event, "event");
+
         if (!event) {
             return res.status(404).json({ status: 0, message: 'Event not found' });
         }

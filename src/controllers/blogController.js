@@ -4,17 +4,21 @@ const Blog = require("../models/blogModel");
 exports.createBlog = async (req, res) => {
   try {
 
-    const { title, shortdescription, fulldescription, facebook, States, City, author } = req.body;
-    console.log(req.body);
+    const { title, shortdescription, fulldescription, facebook, States, City, author , } = req.body;
+    
 
     const imgs = req.files ? req.files.map(file => file.filename) : [];
+    const userid = req.user._id;
 
 
     if (!title || !shortdescription || !fulldescription || !imgs || !facebook || !States || !City || !author) {
       return res.status(400).json({ error: "All fields are required" });
     }
 
-    const newBlog = await Blog.create({ title, shortdescription, img: imgs, fulldescription, facebook, States, City, author });
+    const newBlog = await Blog.create({ title, shortdescription, img: imgs, fulldescription, facebook, States, City, author , userid });
+
+    console.log(userid,"userid");
+    
 
     res.status(201).json({ message: "Blog uploaded successfully", blog: newBlog });
   } catch (error) {
@@ -154,7 +158,7 @@ exports.getAllBlogs = async (req, res) => {
       .limit(limit);
 
     const totalBlogs = await Blog.countDocuments(query);
-console.log(totalBlogs);
+    console.log(totalBlogs);
 
     res.status(200).json({
       message: "Get all blogs",

@@ -3,6 +3,7 @@ const { register, login, updateUser, getUser, sendEmail, ChekEmail, verifyOtp, l
 const upload = require('../../multer');
 const { createBlog, getAllBlogs, getBlogById, deleteBlog, updateBlog, likeBlog, addComment, getComments, editComment, deleteComment } = require('../controllers/blogController');
 const { createTravelPlan, getAllTravelPlans, getTravelPlanById, updateTravelPlan, deleteTravelPlan, likeTravelPlan, commentOnTravelPlan, geteventsComments, editevntsComment, deleteeventsComment, getMostLikedTravelPlans } = require('../controllers/travelPlanController');
+const verifyToken = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -17,7 +18,7 @@ router.post("/logout", logout);
 router.post("/forgotpassword", forgotPassword)
 
 
-router.post("/addblogs", upload.array("img"), createBlog);
+router.post("/addblogs", verifyToken ,upload.array("img"), createBlog);
 router.get("/getblogs", getAllBlogs);
 router.get("/getblog/:id", getBlogById);
 router.delete("/deleteblog/:id", deleteBlog);
