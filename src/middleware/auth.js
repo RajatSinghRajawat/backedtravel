@@ -9,8 +9,8 @@ const verifyToken = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = { _id: decoded.userId }; // ✅ Correct: normalize _id
-    console.log(decoded,"dsfd");
+    req.user = { _id: decoded.id }; 
+    console.log(decoded);
     
     next();
   } catch (error) {

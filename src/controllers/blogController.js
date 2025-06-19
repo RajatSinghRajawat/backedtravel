@@ -18,8 +18,6 @@ exports.createBlog = async (req, res) => {
     const newBlog = await Blog.create({ title, shortdescription, img: imgs, fulldescription, facebook, States, City, author , userid });
 
     console.log(userid,"userid");
-    
-
     res.status(201).json({ message: "Blog uploaded successfully", blog: newBlog });
   } catch (error) {
     console.error(error); // Error log karna useful hota hai
