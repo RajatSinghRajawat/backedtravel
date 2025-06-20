@@ -53,6 +53,8 @@ const TravelPlanSchema = new mongoose.Schema({
 
   likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   comments: [commentSchema],
+    userid: { type: mongoose.Schema.Types.ObjectId, ref: "User",}
+  
 
 });
 

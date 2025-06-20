@@ -4,8 +4,8 @@ const Blog = require("../models/blogModel");
 exports.createBlog = async (req, res) => {
   try {
 
-    const { title, shortdescription, fulldescription, facebook, States, City, author , } = req.body;
-    
+    const { title, shortdescription, fulldescription, facebook, States, City, author, } = req.body;
+
 
     const imgs = req.files ? req.files.map(file => file.filename) : [];
     const userid = req.user._id;
@@ -14,10 +14,9 @@ exports.createBlog = async (req, res) => {
     if (!title || !shortdescription || !fulldescription || !imgs || !facebook || !States || !City || !author) {
       return res.status(400).json({ error: "All fields are required" });
     }
+console.log(userid,"userid");
 
-    const newBlog = await Blog.create({ title, shortdescription, img: imgs, fulldescription, facebook, States, City, author , userid });
-
-    console.log(userid,"userid");
+    const newBlog = await Blog.create({ title, shortdescription, img: imgs, fulldescription, facebook, States, City, author, userid });
     res.status(201).json({ message: "Blog uploaded successfully", blog: newBlog });
   } catch (error) {
     console.error(error); // Error log karna useful hota hai

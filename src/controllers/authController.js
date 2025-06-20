@@ -210,6 +210,8 @@ exports.logout = async (req, res) => {
 
 
 exports.updateUser = async (req, res) => {
+    console.log(req.body, "sdf");
+
     try {
         // Destructure fields from req.body
         const {
@@ -223,8 +225,10 @@ exports.updateUser = async (req, res) => {
             travelStyle,
             budgetRange,
             foodPreference,
-            hiking
+            hiking,
         } = req.body;
+
+        const imgs = req.files ? req.files.map(file => file.filename) : [];
 
         let updatedData = {
             name,
@@ -236,11 +240,13 @@ exports.updateUser = async (req, res) => {
             travelStyle,
             budgetRange,
             foodPreference,
-            hiking
+            hiking,
+            img: imgs
         };
-        // updatedData = Object.fromEntries(
-        //     Object.entries(updatedData).filter(([_, value]) => value !== undefined)
-        // );
+
+        console.log(updatedData, "updatedData");
+
+
 
         if (password) {
             updatedData.password = await bcrypt.hash(password, 10);
@@ -352,7 +358,61 @@ exports.sendUserDetailsToEventCreator = async (req, res) => {
 };
 
 
+exports.getInterestedUsersForEvent = async (req, res) => {
+    try {
+        const { eventId } = req.params;
+        const creator = req.user._id;
+        console.log(creator, "creator");
 
+        const event = await TravelPlan.findById(eventId).populate('creator');
+        if (!event) {
+            return res.status(404).json({ status: 0, message: 'Event not found' });
+        }
+        console.log(event);
+
+        // 🛡️ Safe check for event.creator
+        if (!event.creator || event.creator._id.toString() !== creator.toString()) {
+            return res.status(403).json({
+                status: 0,
+                message: 'Unauthorized: You are not the creator of this event'
+            });
+        }
+
+        const interestedUsers = await User.find({
+            _id: { $in: event.interestedUsers || [] }
+        }).select('name email city country travelStyle');
+
+        if (!interestedUsers.length) {
+            return res.status(200).json({
+                status: 1,
+                message: 'No users have shown interest in this event yet',
+                data: []
+            });
+        }
+
+        const userDetails = interestedUsers.map(user => ({
+            name: user.name,
+            email: user.email,
+            city: user.city || 'N/A',
+            country: user.country || 'N/A',
+            travelStyle: user.travelStyle || 'N/A'
+        }));
+
+        return res.status(200).json({
+            status: 1,
+            message: 'Interested users retrieved successfully',
+            data: userDetails
+        });
+
+    } catch (error) {
+        console.error('Error fetching interested users:', error);
+        return res.status(500).json({
+            status: 0,
+            message: 'Error fetching interested users',
+            error: error.message
+        });
+    }
+};
 
 
 exports.adminregister = async (req, res) => {

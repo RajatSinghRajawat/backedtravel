@@ -4,12 +4,12 @@ const TravelPlan = require("../models/TravelPlan");
 exports.createTravelPlan = async (req, res) => {
   try {
     const { destination, travelBuddyGender, startDate, endDate, transport, budget, travelBuddyAge, travelAuthor, travelDescription, States, City, creator ,interests } = req.body;
-    console.log(req.body);
 
     // If multiple images are uploaded, store their filenames in an array
     const imgs = req.files ? req.files.map(file => file.filename) : [];
 
-    console.log(imgs);
+   const userid = req.user._id;
+console.log(userid,"userid");
 
     const newTravelPlan = new TravelPlan({
       destination,
@@ -25,8 +25,10 @@ exports.createTravelPlan = async (req, res) => {
       City,
       creator,
       interests,
-      img: imgs // Store array of images
+      img: imgs ,
+      userid,
     });
+
 
     // Save to database
     await newTravelPlan.save();
@@ -90,7 +92,7 @@ exports.createTravelPlan = async (req, res) => {
 
 exports.getAllTravelPlans = async (req, res) => {
   try {
-    let { page, limit, States, City, search, mostLiked } = req.query;
+    let { page, limit, States, City, search, mostLiked, userId } = req.query;
 
     page = parseInt(page) || 1;
     limit = parseInt(limit) || 10;
@@ -111,9 +113,13 @@ exports.getAllTravelPlans = async (req, res) => {
       filter.title = { $regex: new RegExp(search, "i") };
     }
 
+    if (userId) {
+      filter.userId = userId; // Match exact userId
+    }
+
     const total = await TravelPlan.countDocuments(filter);
 
-    // 🧠 Use aggregation if mostLiked=true
+    // Sort by likes if requested
     if (mostLiked === "true") {
       const travel = await TravelPlan.aggregate([
         { $match: filter },
@@ -139,7 +145,7 @@ exports.getAllTravelPlans = async (req, res) => {
       });
     }
 
-    // Default: sort by createdAt if not mostLiked
+    // Default sort by newest
     const travel = await TravelPlan.find(filter)
       .skip(skip)
       .limit(limit)
@@ -160,7 +166,6 @@ exports.getAllTravelPlans = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
 
 
 

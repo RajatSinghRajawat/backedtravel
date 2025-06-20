@@ -18,7 +18,8 @@ const UserSchema = new mongoose.Schema({
         default: "Medium" // helpful to avoid this error
     },
     foodPreference: { type: String, enum: ['Vegetarian', 'Non-Vegetarian', 'Vegan'] },
-    hiking: { type: String, default: false }
+    hiking: { type: String, default: false },
+    img: { type: String, required: true },
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', UserSchema);
