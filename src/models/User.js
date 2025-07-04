@@ -19,7 +19,9 @@ const UserSchema = new mongoose.Schema({
     },
     foodPreference: { type: String, enum: ['Vegetarian', 'Non-Vegetarian', 'Vegan'] },
     hiking: { type: String, default: false },
-    img: { type: String }
+img: {
+  type: [String], // or simply: img: [String]
+}
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', UserSchema);
