@@ -1,9 +1,9 @@
 const express = require('express');
-const { register, login, updateUser, getUser, sendEmail, ChekEmail, verifyOtp, logout, forgotPassword, sendUserDetailsToEventCreator, adminregister, getAdmin, getInterestedUsersForEvent } = require('../controllers/authController');
+const { register, login, updateUser, getUser, sendEmail, ChekEmail, verifyOtp, logout, forgotPassword, sendUserDetailsToEventCreator, adminregister, getAdmin, getInterestedUsersForEvent, createAdmin, listAdmins, removeAdmin } = require('../controllers/authController');
 const upload = require('../../multer');
-const { createBlog, getAllBlogs, getBlogById, deleteBlog, updateBlog, likeBlog, addComment, getComments, editComment, deleteComment } = require('../controllers/blogController');
+const { createBlog, getAllBlogs, getBlogById, deleteBlog, updateBlog, likeBlog, addComment, getComments, editComment, deleteComment, createWonderlustBlog } = require('../controllers/blogController');
 const { createTravelPlan, getAllTravelPlans, getTravelPlanById, updateTravelPlan, deleteTravelPlan, likeTravelPlan, commentOnTravelPlan, geteventsComments, editevntsComment, deleteeventsComment, getMostLikedTravelPlans } = require('../controllers/travelPlanController');
-const verifyToken = require('../middleware/auth');
+const { verifyToken, requireRole } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -45,7 +45,13 @@ router.delete("/deleteeventscomments/:commentId/:eventId", deleteeventsComment);
 router.delete("/getMostLikedTravelPlans", getMostLikedTravelPlans);
 
 
+// Admin management (superadmin only)
+router.post('/admin/create', verifyToken, requireRole(['superadmin']), createAdmin);
+router.get('/admin/list', verifyToken, requireRole(['superadmin']), listAdmins);
+router.delete('/admin/remove/:id', verifyToken, requireRole(['superadmin']), removeAdmin);
 
+// Wonderlust blog creation (admin/superadmin only)
+router.post('/blogs/wonderlust', verifyToken, requireRole(['admin', 'superadmin']), createWonderlustBlog);
 
 
 router.post("/adminadd", adminregister)

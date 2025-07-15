@@ -42,7 +42,7 @@ const verifyToken = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = { _id: decoded.id }; 
+    req.user = { _id: decoded.id, role: decoded.role }; // Attach role from JWT
     console.log(decoded);
     
     next();
@@ -52,4 +52,15 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-module.exports = verifyToken;
+// Role-based access control middleware
+const requireRole = (roles) => (req, res, next) => {
+  if (!req.user || !roles.includes(req.user.role)) {
+    return res.status(403).json({ message: 'Access denied: insufficient role' });
+  }
+  next();
+};
+
+module.exports = {
+  verifyToken,
+  requireRole,
+};

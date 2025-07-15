@@ -231,3 +231,23 @@ exports.updateBlog = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+// Create a blog in the Wonderlust section (admin/superadmin only)
+exports.createWonderlustBlog = async (req, res) => {
+  try {
+    if (!['admin', 'superadmin'].includes(req.user.role)) {
+      return res.status(403).json({ message: 'Access denied: Only admin or superadmin can create Wonderlust blogs' });
+    }
+    const { title, content, section } = req.body;
+    if (section !== 'Wonderlust') {
+      return res.status(400).json({ message: 'Section must be Wonderlust' });
+    }
+    if (!title || !content) {
+      return res.status(400).json({ message: 'Title and content are required' });
+    }
+    const blog = await Blog.create({ title, content, section, author: req.user._id });
+    res.status(201).json({ message: 'Blog created successfully', blog });
+  } catch (error) {
+    res.status(500).json({ message: 'Error creating Wonderlust blog', error });
+  }
+};

@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Backend2 API Documentation</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; background: #f9f9f9; }
+    h1, h2, h3 { color: #2c3e50; }
+    .endpoint { background: #fff; border-radius: 8px; box-shadow: 0 2px 8px #eee; margin-bottom: 2rem; padding: 1.5rem; }
+    code, pre { background: #f4f4f4; border-radius: 4px; padding: 0.5rem; }
+    .method { font-weight: bold; color: #fff; padding: 2px 8px; border-radius: 4px; }
+    .POST { background: #27ae60; }
+    .GET { background: #2980b9; }
+    .PUT { background: #f39c12; }
+    .DELETE { background: #c0392b; }
+    .role { font-size: 0.95em; color: #8e44ad; }
+    .section { margin-bottom: 2rem; }
+    .url { font-family: monospace; color: #34495e; }
+  </style>
+</head>
+<body>
+  <h1>Backend2 API Documentation</h1>
+  <p>All endpoints are prefixed with <code>/api</code> (if using a global prefix in your server setup). Replace <code>localhost:5000</code> with your server URL as needed.</p>
+
+  <div class="section">
+    <h2>Authentication & Roles</h2>
+    <ul>
+      <li>Some endpoints require a JWT token in the <code>Authorization</code> header as <code>Bearer &lt;token&gt;</code>.</li>
+      <li>Roles: <b>user</b>, <b>admin</b>, <b>superadmin</b></li>
+      <li>Role-based access is enforced using middleware.</li>
+    </ul>
+  </div>
+
+  <!-- User Auth -->
+  <div class="endpoint">
+    <h2><span class="method POST">POST</span> <span class="url">/register</span></h2>
+    <div class="role">Role: Public</div>
+    <p>Register a new user (default role: user).</p>
+    <h4>Request Body:</h4>
+    <pre>{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "yourpassword"
+}</pre>
+    <h4>Response:</h4>
+    <pre>{
+  "message": "User registered successfully",
+  "token": "<JWT_TOKEN>",
+  "user": { ... }
+}</pre>
+  </div>
+
+  <div class="endpoint">
+    <h2><span class="method POST">POST</span> <span class="url">/login</span></h2>
+    <div class="role">Role: Public</div>
+    <p>Login and receive a JWT token.</p>
+    <h4>Request Body:</h4>
+    <pre>{
+  "email": "john@example.com",
+  "password": "yourpassword"
+}</pre>
+    <h4>Response:</h4>
+    <pre>{
+  "message": "Login successful",
+  "token": "<JWT_TOKEN>",
+  "user": { ... }
+}</pre>
+  </div>
+
+  <div class="endpoint">
+    <h2><span class="method GET">GET</span> <span class="url">/user/:id</span></h2>
+    <div class="role">Role: Public</div>
+    <p>Get user details by ID.</p>
+    <h4>Response:</h4>
+    <pre>{
+  "message": "User fetched successfully",
+  "user": { ... }
+}</pre>
+  </div>
+
+  <div class="endpoint">
+    <h2><span class="method PUT">PUT</span> <span class="url">/update/:id</span></h2>
+    <div class="role">Role: Authenticated</div>
+    <p>Update user details by ID.</p>
+    <h4>Headers:</h4>
+    <pre>Authorization: Bearer &lt;token&gt;</pre>
+    <h4>Request Body:</h4>
+    <pre>{
+  // Fields to update (see User model)
+}</pre>
+    <h4>Response:</h4>
+    <pre>{
+  "message": "User updated successfully",
+  "user": { ... }
+}</pre>
+  </div>
+
+  <div class="endpoint">
+    <h2><span class="method POST">POST</span> <span class="url">/sendemail</span></h2>
+    <div class="role">Role: Public</div>
+    <p>Send OTP email for verification.</p>
+    <h4>Request Body:</h4>
+    <pre>{
+  "email": "john@example.com"
+}</pre>
+    <h4>Response:</h4>
+    <pre>{ "message": "Email sent successfully" }</pre>
+  </div>
+
+  <div class="endpoint">
+    <h2><span class="method POST">POST</span> <span class="url">/checkemail</span></h2>
+    <div class="role">Role: Public</div>
+    <p>Check if email is available.</p>
+    <h4>Request Body:</h4>
+    <pre>{ "email": "john@example.com" }</pre>
+    <h4>Response:</h4>
+    <pre>{ "status": 0 or 1, ... }</pre>
+  </div>
+
+  <div class="endpoint">
+    <h2><span class="method POST">POST</span> <span class="url">/verifyotp</span></h2>
+    <div class="role">Role: Public</div>
+    <p>Verify OTP for email.</p>
+    <h4>Request Body:</h4>
+    <pre>{ "email": "john@example.com", "otp": 123456 }</pre>
+    <h4>Response:</h4>
+    <pre>{ "status": 1, "message": "OTP verified successfully" }</pre>
+  </div>
+
+  <div class="endpoint">
+    <h2><span class="method POST">POST</span> <span class="url">/logout</span></h2>
+    <div class="role">Role: Authenticated</div>
+    <p>Logout user (client should remove token).</p>
+    <h4>Headers:</h4>
+    <pre>Authorization: Bearer &lt;token&gt;</pre>
+    <h4>Response:</h4>
+    <pre>{ "message": "Logout successful. Remove token from client side." }</pre>
+  </div>
+
+  <div class="endpoint">
+    <h2><span class="method POST">POST</span> <span class="url">/forgotpassword</span></h2>
+    <div class="role">Role: Public</div>
+    <p>Reset password using email and OTP.</p>
+    <h4>Request Body:</h4>
+    <pre>{ "email": "john@example.com", "password": "newpassword" }</pre>
+    <h4>Response:</h4>
+    <pre>{ "status": 1, "message": "Password reset successfully" }</pre>
+  </div>
+
+  <!-- Blog APIs -->
+  <div class="endpoint">
+    <h2><span class="method POST">POST</span> <span class="url">/addblogs</span></h2>
+    <div class="role">Role: Authenticated</div>
+    <p>Create a new blog (general, not Wonderlust-specific).</p>
+    <h4>Headers:</h4>
+    <pre>Authorization: Bearer &lt;token&gt;</pre>
+    <h4>Request Body:</h4>
+    <pre>{ /* blog fields */ }</pre>
+    <h4>Response:</h4>
+    <pre>{ "message": "Blog uploaded successfully", "blog": { ... } }</pre>
+  </div>
+
+  <div class="endpoint">
+    <h2><span class="method GET">GET</span> <span class="url">/getblogs</span></h2>
+    <div class="role">Role: Public</div>
+    <p>Get all blogs (with optional filters).</p>
+    <h4>Query Params:</h4>
+    <pre>{ "page": 1, "limit": 10, ... }</pre>
+    <h4>Response:</h4>
+    <pre>{ "message": "Get all blogs", "blogs": [ ... ] }</pre>
+  </div>
+
+  <div class="endpoint">
+    <h2><span class="method GET">GET</span> <span class="url">/getblog/:id</span></h2>
+    <div class="role">Role: Public</div>
+    <p>Get a single blog by ID.</p>
+    <h4>Response:</h4>
+    <pre>{ "message": "Blog found successfully", "blog": { ... } }</pre>
+  </div>
+
+  <div class="endpoint">
+    <h2><span class="method DELETE">DELETE</span> <span class="url">/deleteblog/:id</span></h2>
+    <div class="role">Role: Authenticated</div>
+    <p>Delete a blog by ID.</p>
+    <h4>Headers:</h4>
+    <pre>Authorization: Bearer &lt;token&gt;</pre>
+    <h4>Response:</h4>
+    <pre>{ "message": "Blog deleted successfully" }</pre>
+  </div>
+
+  <div class="endpoint">
+    <h2><span class="method PUT">PUT</span> <span class="url">/updateblog/:id</span></h2>
+    <div class="role">Role: Authenticated</div>
+    <p>Update a blog by ID.</p>
+    <h4>Headers:</h4>
+    <pre>Authorization: Bearer &lt;token&gt;</pre>
+    <h4>Request Body:</h4>
+    <pre>{ /* blog fields to update */ }</pre>
+    <h4>Response:</h4>
+    <pre>{ "message": "Blog updated successfully", "blog": { ... } }</pre>
+  </div>
+
+  <div class="endpoint">
+    <h2><span class="method POST">POST</span> <span class="url">/like/:id</span></h2>
+    <div class="role">Role: Authenticated</div>
+    <p>Like or unlike a blog by ID.</p>
+    <h4>Headers:</h4>
+    <pre>Authorization: Bearer &lt;token&gt;</pre>
+    <h4>Request Body:</h4>
+    <pre>{ "userId": "..." }</pre>
+    <h4>Response:</h4>
+    <pre>{ "message": "Liked" or "Unliked", "likes": n }</pre>
+  </div>
+
+  <div class="endpoint">
+    <h2><span class="method POST">POST</span> <span class="url">/comment/:id</span></h2>
+    <div class="role">Role: Authenticated</div>
+    <p>Add a comment to a blog.</p>
+    <h4>Headers:</h4>
+    <pre>Authorization: Bearer &lt;token&gt;</pre>
+    <h4>Request Body:</h4>
+    <pre>{ "userId": "...", "text": "..." }</pre>
+    <h4>Response:</h4>
+    <pre>{ "message": "Comment added", "comments": [ ... ] }</pre>
+  </div>
+
+  <div class="endpoint">
+    <h2><span class="method GET">GET</span> <span class="url">/comments/:id</span></h2>
+    <div class="role">Role: Public</div>
+    <p>Get all comments for a blog.</p>
+    <h4>Response:</h4>
+    <pre>{ "comments": [ ... ] }</pre>
+  </div>
+
+  <div class="endpoint">
+    <h2><span class="method PUT">PUT</span> <span class="url">/comments/:commentId/:blogId</span></h2>
+    <div class="role">Role: Authenticated</div>
+    <p>Edit a comment on a blog.</p>
+    <h4>Headers:</h4>
+    <pre>Authorization: Bearer &lt;token&gt;</pre>
+    <h4>Request Body:</h4>
+    <pre>{ "userId": "...", "text": "..." }</pre>
+    <h4>Response:</h4>
+    <pre>{ "message": "Comment updated", "comments": [ ... ] }</pre>
+  </div>
+
+  <div class="endpoint">
+    <h2><span class="method DELETE">DELETE</span> <span class="url">/deletecomments/:commentId/:blogId</span></h2>
+    <div class="role">Role: Authenticated</div>
+    <p>Delete a comment from a blog.</p>
+    <h4>Headers:</h4>
+    <pre>Authorization: Bearer &lt;token&gt;</pre>
+    <h4>Request Body:</h4>
+    <pre>{ "userId": "..." }</pre>
+    <h4>Response:</h4>
+    <pre>{ "message": "Comment deleted", "comments": [ ... ] }</pre>
+  </div>
+
+  <!-- Wonderlust Blog (admin/superadmin only) -->
+  <div class="endpoint">
+    <h2><span class="method POST">POST</span> <span class="url">/blogs/wonderlust</span></h2>
+    <div class="role">Role: admin, superadmin</div>
+    <p>Create a blog in the Wonderlust section.</p>
+    <h4>Headers:</h4>
+    <pre>Authorization: Bearer &lt;admin_or_superadmin_token&gt;</pre>
+    <h4>Request Body:</h4>
+    <pre>{ "title": "...", "content": "...", "section": "Wonderlust" }</pre>
+    <h4>Response:</h4>
+    <pre>{ "message": "Blog created successfully", "blog": { ... } }</pre>
+  </div>
+
+  <!-- Travel Plan APIs -->
+  <div class="endpoint">
+    <h2><span class="method POST">POST</span> <span class="url">/addEvents</span></h2>
+    <div class="role">Role: Authenticated</div>
+    <p>Create a new travel plan.</p>
+    <h4>Headers:</h4>
+    <pre>Authorization: Bearer &lt;token&gt;</pre>
+    <h4>Request Body:</h4>
+    <pre>{ /* travel plan fields */ }</pre>
+    <h4>Response:</h4>
+    <pre>{ "success": true, "message": "Travel plan created successfully", "data": { ... } }</pre>
+  </div>
+
+  <div class="endpoint">
+    <h2><span class="method GET">GET</span> <span class="url">/getEvents</span></h2>
+    <div class="role">Role: Public</div>
+    <p>Get all travel plans (with optional filters).</p>
+    <h4>Query Params:</h4>
+    <pre>{ "page": 1, "limit": 10, ... }</pre>
+    <h4>Response:</h4>
+    <pre>{ "message": "Get all Events", "travel": [ ... ] }</pre>
+  </div>
+
+  <div class="endpoint">
+    <h2><span class="method GET">GET</span> <span class="url">/getevents/:id</span></h2>
+    <div class="role">Role: Public</div>
+    <p>Get a single travel plan by ID.</p>
+    <h4>Response:</h4>
+    <pre>{ "success": true, "data": { ... } }</pre>
+  </div>
+
+  <div class="endpoint">
+    <h2><span class="method DELETE">DELETE</span> <span class="url">/deleteTravelPlan/:id</span></h2>
+    <div class="role">Role: Authenticated</div>
+    <p>Delete a travel plan by ID.</p>
+    <h4>Headers:</h4>
+    <pre>Authorization: Bearer &lt;token&gt;</pre>
+    <h4>Response:</h4>
+    <pre>{ "success": true, "message": "Deleted successfully" }</pre>
+  </div>
+
+  <div class="endpoint">
+    <h2><span class="method PUT">PUT</span> <span class="url">/updateTravelPlan/:id</span></h2>
+    <div class="role">Role: Authenticated</div>
+    <p>Update a travel plan by ID.</p>
+    <h4>Headers:</h4>
+    <pre>Authorization: Bearer &lt;token&gt;</pre>
+    <h4>Request Body:</h4>
+    <pre>{ /* travel plan fields to update */ }</pre>
+    <h4>Response:</h4>
+    <pre>{ "success": true, "message": "Updated successfully", "data": { ... } }</pre>
+  </div>
+
+  <div class="endpoint">
+    <h2><span class="method POST">POST</span> <span class="url">/likes/:id</span></h2>
+    <div class="role">Role: Authenticated</div>
+    <p>Like or unlike a travel plan by ID.</p>
+    <h4>Headers:</h4>
+    <pre>Authorization: Bearer &lt;token&gt;</pre>
+    <h4>Request Body:</h4>
+    <pre>{ "userId": "..." }</pre>
+    <h4>Response:</h4>
+    <pre>{ "message": "Liked" or "Unliked", "likes": n }</pre>
+  </div>
+
+  <div class="endpoint">
+    <h2><span class="method POST">POST</span> <span class="url">/commentevent/:id</span></h2>
+    <div class="role">Role: Authenticated</div>
+    <p>Add a comment to a travel plan.</p>
+    <h4>Headers:</h4>
+    <pre>Authorization: Bearer &lt;token&gt;</pre>
+    <h4>Request Body:</h4>
+    <pre>{ "userId": "...", "text": "..." }</pre>
+    <h4>Response:</h4>
+    <pre>{ "success": true, "comments": [ ... ] }</pre>
+  </div>
+
+  <div class="endpoint">
+    <h2><span class="method GET">GET</span> <span class="url">/commentsevent/:id</span></h2>
+    <div class="role">Role: Public</div>
+    <p>Get all comments for a travel plan.</p>
+    <h4>Response:</h4>
+    <pre>{ "comments": [ ... ] }</pre>
+  </div>
+
+  <div class="endpoint">
+    <h2><span class="method PUT">PUT</span> <span class="url">/editeventscomments/:commentId/:eventId</span></h2>
+    <div class="role">Role: Authenticated</div>
+    <p>Edit a comment on a travel plan.</p>
+    <h4>Headers:</h4>
+    <pre>Authorization: Bearer &lt;token&gt;</pre>
+    <h4>Request Body:</h4>
+    <pre>{ "userId": "...", "text": "..." }</pre>
+    <h4>Response:</h4>
+    <pre>{ "message": "Comment updated", "comments": [ ... ] }</pre>
+  </div>
+
+  <div class="endpoint">
+    <h2><span class="method DELETE">DELETE</span> <span class="url">/deleteeventscomments/:commentId/:eventId</span></h2>
+    <div class="role">Role: Authenticated</div>
+    <p>Delete a comment from a travel plan.</p>
+    <h4>Headers:</h4>
+    <pre>Authorization: Bearer &lt;token&gt;</pre>
+    <h4>Request Body:</h4>
+    <pre>{ "userId": "..." }</pre>
+    <h4>Response:</h4>
+    <pre>{ "message": "Comment deleted", "comments": [ ... ] }</pre>
+  </div>
+
+  <div class="endpoint">
+    <h2><span class="method DELETE">DELETE</span> <span class="url">/getMostLikedTravelPlans</span></h2>
+    <div class="role">Role: Public</div>
+    <p>Get most liked travel plans (aggregation).</p>
+    <h4>Response:</h4>
+    <pre>{ "success": true, "data": [ ... ] }</pre>
+  </div>
+
+  <!-- Admin Management (superadmin only) -->
+  <div class="endpoint">
+    <h2><span class="method POST">POST</span> <span class="url">/admin/create</span></h2>
+    <div class="role">Role: superadmin</div>
+    <p>Create a new admin user.</p>
+    <h4>Headers:</h4>
+    <pre>Authorization: Bearer &lt;superadmin_token&gt;</pre>
+    <h4>Request Body:</h4>
+    <pre>{ "name": "...", "email": "...", "password": "..." }</pre>
+    <h4>Response:</h4>
+    <pre>{ "message": "Admin created successfully", "admin": { ... } }</pre>
+  </div>
+
+  <div class="endpoint">
+    <h2><span class="method GET">GET</span> <span class="url">/admin/list</span></h2>
+    <div class="role">Role: superadmin</div>
+    <p>List all admin users.</p>
+    <h4>Headers:</h4>
+    <pre>Authorization: Bearer &lt;superadmin_token&gt;</pre>
+    <h4>Response:</h4>
+    <pre>{ "admins": [ ... ] }</pre>
+  </div>
+
+  <div class="endpoint">
+    <h2><span class="method DELETE">DELETE</span> <span class="url">/admin/remove/:id</span></h2>
+    <div class="role">Role: superadmin</div>
+    <p>Remove an admin user by ID.</p>
+    <h4>Headers:</h4>
+    <pre>Authorization: Bearer &lt;superadmin_token&gt;</pre>
+    <h4>Response:</h4>
+    <pre>{ "message": "Admin removed successfully" }</pre>
+  </div>
+
+  <!-- Miscellaneous/Admin APIs -->
+  <div class="endpoint">
+    <h2><span class="method POST">POST</span> <span class="url">/adminadd</span></h2>
+    <div class="role">Role: Public (legacy?)</div>
+    <p>Register admin (legacy, not role-protected).</p>
+  </div>
+  <div class="endpoint">
+    <h2><span class="method POST">POST</span> <span class="url">/adminget</span></h2>
+    <div class="role">Role: Public (legacy?)</div>
+    <p>Get admin (legacy, not role-protected).</p>
+  </div>
+
+</body>
+</html> 

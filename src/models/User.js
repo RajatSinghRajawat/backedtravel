@@ -21,7 +21,12 @@ const UserSchema = new mongoose.Schema({
     hiking: { type: String, default: false },
 img: {
   type: [String], // or simply: img: [String]
-}
+},
+    role: {
+      type: String,
+      enum: ['superadmin', 'admin', 'user'],
+      default: 'user',
+    }
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', UserSchema);

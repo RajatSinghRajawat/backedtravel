@@ -156,16 +156,17 @@ exports.register = async (req, res) => {
         const { email, password } = req.body;
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const user = await User.findOne({ email });
+        let user = await User.findOne({ email });
+        if (!user) {
+            user = new User({ email, password: hashedPassword });
+            await user.save();
+        } else {
+            user.password = hashedPassword;
+            await user.save();
+        }
 
-        const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
-
-        user.password = hashedPassword;
-        user.token = token;
-
-
-
-        await user.save();
+        // Include role in JWT
+        const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "7d" });
         res.status(201).json({ message: "User registered successfully", token, user });
     } catch (error) {
         res.status(500).json({ message: "Error registering user", error });
@@ -180,11 +181,10 @@ exports.login = async (req, res) => {
         if (!user) return res.status(404).json({ message: "User not found" });
 
         const isMatch = await bcrypt.compare(password, user.password);
-        console.log(isMatch, "dfddf");
-
         if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
+        // Include role in JWT
+        const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "7d" });
         res.json({ message: "Login successful", token, user });
     } catch (error) {
         res.status(500).json({ message: "Error logging in", error });
@@ -452,5 +452,58 @@ exports.getAdmin = async (req, res) => {
         res.json({ message: "User fetched successfully", admin });
     } catch (error) {
         res.status(500).json({ message: "Error fetching user", error });
+    }
+};
+
+// Create a new admin (superadmin only)
+exports.createAdmin = async (req, res) => {
+    try {
+        if (req.user.role !== 'superadmin') {
+            return res.status(403).json({ message: 'Access denied: Only superadmin can create admins' });
+        }
+        const { name, email, password } = req.body;
+        if (!name || !email || !password) {
+            return res.status(400).json({ message: 'Name, email, and password are required' });
+        }
+        let user = await User.findOne({ email });
+        if (user) {
+            return res.status(409).json({ message: 'Email already registered' });
+        }
+        const hashedPassword = await bcrypt.hash(password, 10);
+        user = new User({ name, email, password: hashedPassword, role: 'admin' });
+        await user.save();
+        res.status(201).json({ message: 'Admin created successfully', admin: user });
+    } catch (error) {
+        res.status(500).json({ message: 'Error creating admin', error });
+    }
+};
+
+// List all admins (superadmin only)
+exports.listAdmins = async (req, res) => {
+    try {
+        if (req.user.role !== 'superadmin') {
+            return res.status(403).json({ message: 'Access denied: Only superadmin can list admins' });
+        }
+        const admins = await User.find({ role: 'admin' }).select('-password');
+        res.status(200).json({ admins });
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching admins', error });
+    }
+};
+
+// Remove an admin by ID (superadmin only)
+exports.removeAdmin = async (req, res) => {
+    try {
+        if (req.user.role !== 'superadmin') {
+            return res.status(403).json({ message: 'Access denied: Only superadmin can remove admins' });
+        }
+        const { id } = req.params;
+        const admin = await User.findOneAndDelete({ _id: id, role: 'admin' });
+        if (!admin) {
+            return res.status(404).json({ message: 'Admin not found' });
+        }
+        res.status(200).json({ message: 'Admin removed successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error removing admin', error });
     }
 };

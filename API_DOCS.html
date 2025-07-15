@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wonderlust Admin API Documentation</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; background: #f9f9f9; }
+    h1, h2, h3 { color: #2c3e50; }
+    .endpoint { background: #fff; border-radius: 8px; box-shadow: 0 2px 8px #eee; margin-bottom: 2rem; padding: 1.5rem; }
+    code, pre { background: #f4f4f4; border-radius: 4px; padding: 0.5rem; }
+    .method { font-weight: bold; color: #fff; padding: 2px 8px; border-radius: 4px; }
+    .POST { background: #27ae60; }
+    .GET { background: #2980b9; }
+    .DELETE { background: #c0392b; }
+    .role { font-size: 0.95em; color: #8e44ad; }
+    .section { margin-bottom: 2rem; }
+  </style>
+</head>
+<body>
+  <h1>Wonderlust Admin API Documentation</h1>
+  <p>This documentation covers the admin/superadmin system for the Wonderlust blog section. Only admins and superadmins can create blogs in Wonderlust. Superadmin can manage (add/remove/list) admins.</p>
+
+  <div class="section">
+    <h2>Authentication</h2>
+    <p>All protected endpoints require a JWT token in the <code>Authorization</code> header as <code>Bearer &lt;token&gt;</code>.</p>
+  </div>
+
+  <div class="endpoint">
+    <h2><span class="method POST">POST</span> /api/auth/register</h2>
+    <div class="role">Role: Public</div>
+    <p>Register a new user (default role: user).</p>
+    <h4>Request Body (JSON):</h4>
+    <pre>{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "yourpassword"
+}</pre>
+    <h4>Response:</h4>
+    <pre>{
+  "message": "User registered successfully",
+  "user": { ... }
+}</pre>
+    <h4>Postman Example:</h4>
+    <pre>{
+  "method": "POST",
+  "url": "http://localhost:5000/api/auth/register",
+  "body": {
+    "mode": "raw",
+    "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"yourpassword\"\n}"
+  },
+  "headers": [
+    { "key": "Content-Type", "value": "application/json" }
+  ]
+}</pre>
+  </div>
+
+  <div class="endpoint">
+    <h2><span class="method POST">POST</span> /api/auth/login</h2>
+    <div class="role">Role: Public</div>
+    <p>Login and receive a JWT token.</p>
+    <h4>Request Body (JSON):</h4>
+    <pre>{
+  "email": "john@example.com",
+  "password": "yourpassword"
+}</pre>
+    <h4>Response:</h4>
+    <pre>{
+  "token": "<JWT_TOKEN>",
+  "user": { ... }
+}</pre>
+    <h4>Postman Example:</h4>
+    <pre>{
+  "method": "POST",
+  "url": "http://localhost:5000/api/auth/login",
+  "body": {
+    "mode": "raw",
+    "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"yourpassword\"\n}"
+  },
+  "headers": [
+    { "key": "Content-Type", "value": "application/json" }
+  ]
+}</pre>
+  </div>
+
+  <div class="endpoint">
+    <h2><span class="method POST">POST</span> /api/admin/create</h2>
+    <div class="role">Role: superadmin</div>
+    <p>Create a new admin user. Only accessible by superadmin.</p>
+    <h4>Headers:</h4>
+    <pre>Authorization: Bearer &lt;superadmin_token&gt;</pre>
+    <h4>Request Body (JSON):</h4>
+    <pre>{
+  "name": "Admin User",
+  "email": "admin@example.com",
+  "password": "adminpassword"
+}</pre>
+    <h4>Response:</h4>
+    <pre>{
+  "message": "Admin created successfully",
+  "admin": { ... }
+}</pre>
+    <h4>Postman Example:</h4>
+    <pre>{
+  "method": "POST",
+  "url": "http://localhost:5000/api/admin/create",
+  "body": {
+    "mode": "raw",
+    "raw": "{\n  \"name\": \"Admin User\",\n  \"email\": \"admin@example.com\",\n  \"password\": \"adminpassword\"\n}"
+  },
+  "headers": [
+    { "key": "Content-Type", "value": "application/json" },
+    { "key": "Authorization", "value": "Bearer <superadmin_token>" }
+  ]
+}</pre>
+  </div>
+
+  <div class="endpoint">
+    <h2><span class="method GET">GET</span> /api/admin/list</h2>
+    <div class="role">Role: superadmin</div>
+    <p>List all admin users. Only accessible by superadmin.</p>
+    <h4>Headers:</h4>
+    <pre>Authorization: Bearer &lt;superadmin_token&gt;</pre>
+    <h4>Response:</h4>
+    <pre>{
+  "admins": [ { ... }, ... ]
+}</pre>
+    <h4>Postman Example:</h4>
+    <pre>{
+  "method": "GET",
+  "url": "http://localhost:5000/api/admin/list",
+  "headers": [
+    { "key": "Authorization", "value": "Bearer <superadmin_token>" }
+  ]
+}</pre>
+  </div>
+
+  <div class="endpoint">
+    <h2><span class="method DELETE">DELETE</span> /api/admin/remove/:id</h2>
+    <div class="role">Role: superadmin</div>
+    <p>Remove an admin user by their ID. Only accessible by superadmin.</p>
+    <h4>Headers:</h4>
+    <pre>Authorization: Bearer &lt;superadmin_token&gt;</pre>
+    <h4>Response:</h4>
+    <pre>{
+  "message": "Admin removed successfully"
+}</pre>
+    <h4>Postman Example:</h4>
+    <pre>{
+  "method": "DELETE",
+  "url": "http://localhost:5000/api/admin/remove/ADMIN_ID",
+  "headers": [
+    { "key": "Authorization", "value": "Bearer <superadmin_token>" }
+  ]
+}</pre>
+  </div>
+
+  <div class="endpoint">
+    <h2><span class="method POST">POST</span> /api/blogs/wonderlust</h2>
+    <div class="role">Role: admin, superadmin</div>
+    <p>Create a blog in the Wonderlust section. Only accessible by admin or superadmin.</p>
+    <h4>Headers:</h4>
+    <pre>Authorization: Bearer &lt;admin_or_superadmin_token&gt;</pre>
+    <h4>Request Body (JSON):</h4>
+    <pre>{
+  "title": "My Wonderlust Blog",
+  "content": "Blog content here...",
+  "section": "Wonderlust"
+}</pre>
+    <h4>Response:</h4>
+    <pre>{
+  "message": "Blog created successfully",
+  "blog": { ... }
+}</pre>
+    <h4>Postman Example:</h4>
+    <pre>{
+  "method": "POST",
+  "url": "http://localhost:5000/api/blogs/wonderlust",
+  "body": {
+    "mode": "raw",
+    "raw": "{\n  \"title\": \"My Wonderlust Blog\",\n  \"content\": \"Blog content here...\",\n  \"section\": \"Wonderlust\"\n}"
+  },
+  "headers": [
+    { "key": "Content-Type", "value": "application/json" },
+    { "key": "Authorization", "value": "Bearer <admin_or_superadmin_token>" }
+  ]
+}</pre>
+  </div>
+
+  <div class="section">
+    <h2>Notes</h2>
+    <ul>
+      <li>Replace <code>&lt;token&gt;</code> with the JWT token received from login.</li>
+      <li>Replace <code>ADMIN_ID</code> with the actual admin's user ID.</li>
+      <li>Only superadmin can create, list, or remove admins.</li>
+      <li>Only admin/superadmin can create blogs in the Wonderlust section.</li>
+      <li>All requests and responses are in JSON format.</li>
+    </ul>
+  </div>
+</body>
+</html> 
