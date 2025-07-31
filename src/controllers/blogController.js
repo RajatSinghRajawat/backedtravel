@@ -14,7 +14,7 @@ exports.createBlog = async (req, res) => {
     if (!title || !shortdescription || !fulldescription || !imgs || !facebook || !States || !City || !author) {
       return res.status(400).json({ error: "All fields are required" });
     }
-console.log(userid,"userid");
+    console.log(userid, "userid");
 
     const newBlog = await Blog.create({ title, shortdescription, img: imgs, fulldescription, facebook, States, City, author, userid });
     res.status(201).json({ message: "Blog uploaded successfully", blog: newBlog });
